@@ -1,0 +1,24 @@
+<?php
+
+namespace {{ namespace }};
+
+use Cerbero\ConsoleTasker\Tasks\AbstractFilesManipulatorTask;
+
+/**
+ * The task to {{ purpose }}.
+ *
+ */
+class {{ class }} extends AbstractFilesManipulatorTask
+{
+    /**
+     * Run the task
+     *
+     * @return mixed
+     */
+    protected function run()
+    {
+        $this->file('path/to/file/to/update')
+            ->addLineAfterLast('text to search', 'line to add')
+            ->needsManualUpdateTo('implement something');
+    }
+}

@@ -1,0 +1,22 @@
+<?php
+
+namespace {{ namespace }};
+
+use Cerbero\ConsoleTasker\Tasks\AbstractTask;
+
+/**
+ * The task to {{ purpose }}.
+ *
+ */
+class {{ class }} extends AbstractTask
+{
+    /**
+     * Run the task
+     *
+     * @return mixed
+     */
+    protected function run()
+    {
+        // @todo Implement logic
+    }
+}

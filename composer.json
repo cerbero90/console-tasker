@@ -3,7 +3,9 @@
     "type": "library",
     "description": "Laravel package to run and manage tasks in Artisan commands.",
     "keywords": [
-        "laravel"
+        "laravel",
+        "console",
+        "cli"
     ],
     "homepage": "https://github.com/cerbero90/console-tasker",
     "license": "MIT",
@@ -15,7 +17,10 @@
     }],
     "require": {
         "php": "^7.1||^8.0",
-        "illuminate/contracts": ">=5.5"
+        "illuminate/console": ">=5.5",
+        "illuminate/container": ">=5.5",
+        "illuminate/contracts": ">=5.5",
+        "illuminate/support": ">=5.5"
     },
     "require-dev": {
         "orchestra/testbench": ">=3.5",
@@ -40,6 +45,11 @@
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Cerbero\\ConsoleTasker\\Providers\\ConsoleTaskerProvider"
+            ]
         }
     },
     "config": {
