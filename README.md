@@ -28,6 +28,7 @@ To do:
 1. document package usage in `README.md`
 1. add tests
 1. enable scheduled builds in `.github/workflows/build.yml`
+1. fix some builds that are currently failing
 
 ## Change log
 
