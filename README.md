@@ -24,10 +24,9 @@ composer require cerbero/console-tasker
 
 ## Usage
 
-``` php
-$skeleton = new Cerbero\ConsoleTasker\SkeletonClass();
-echo $skeleton->echoPhrase('Hello, League!');
-```
+To do:
+1. document package usage in README.md
+1. add tests
 
 ## Change log
 
