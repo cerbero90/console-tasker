@@ -62,6 +62,16 @@ class CreateCommand extends AbstractCreatorTask
     }
 
     /**
+     * Retrieve the reason why the file needs to be updated manually
+     *
+     * @return string|null
+     */
+    public function needsManualUpdateTo(): ?string
+    {
+        return 'write command description';
+    }
+
+    /**
      * Retrieve the replacements to apply on the stub
      *
      * @return array
@@ -116,6 +126,6 @@ class CreateCommand extends AbstractCreatorTask
 
         return array_reduce($parsedTasks, function (string $carry, ParsedTask $task) use ($namespace) {
             return $carry .= "use {$namespace}\\{$task->name};" . PHP_EOL;
-        }, '') . PHP_EOL;
+        }, '');
     }
 }
