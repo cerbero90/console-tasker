@@ -15,7 +15,7 @@ class {{ class }} extends AbstractFilesManipulatorTask
      *
      * @return mixed
      */
-    protected function run()
+    public function run()
     {
         $this->file('path/to/file/to/update')
             ->addLineAfterLast('text to search', 'line to add')

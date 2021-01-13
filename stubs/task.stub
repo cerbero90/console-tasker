@@ -15,7 +15,7 @@ class {{ class }} extends AbstractTask
      *
      * @return mixed
      */
-    protected function run()
+    public function run()
     {
         // @todo Implement logic
     }
