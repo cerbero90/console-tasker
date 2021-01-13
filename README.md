@@ -25,8 +25,9 @@ composer require cerbero/console-tasker
 ## Usage
 
 To do:
-1. document package usage in README.md
+1. document package usage in `README.md`
 1. add tests
+1. enable scheduled builds in `.github/workflows/build.yml`
 
 ## Change log
 
