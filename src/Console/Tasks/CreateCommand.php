@@ -62,12 +62,36 @@ class CreateCommand extends AbstractCreatorTask
     }
 
     /**
+     * Determine whether this task should run
+     *
+     * @return bool
+     */
+    public function shouldRun(): bool
+    {
+        return !file_exists($this->getPath());
+    }
+
+    /**
+     * Retrieve the reason why this task should not run
+     *
+     * @return string|null
+     */
+    public function getSkippingReason(): ?string
+    {
+        return 'the command already exists';
+    }
+
+    /**
      * Retrieve the reason why the file needs to be updated manually
      *
      * @return string|null
      */
     public function needsManualUpdateTo(): ?string
     {
+        if ($this->option('command') == 'command:name') {
+            return 'write command name and description';
+        }
+
         return 'write command description';
     }
 
