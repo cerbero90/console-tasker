@@ -44,6 +44,8 @@ class ConsoleTasker
      */
     public function runTasks(iterable $tasks): void
     {
+        $this->newLine();
+
         try {
             foreach ($tasks as $class) {
                 $this->processTask($this->resolveTask($class));
@@ -70,7 +72,7 @@ class ConsoleTasker
         $invalidTask = new InvalidTask($class);
 
         try {
-            $task = Container::getInstance()->make($class)->setIO($this->input, $this->output);
+            $task = Container::getInstance()->make($class);
             $valid = $task instanceof AbstractTask;
         } catch (Throwable $e) {
             $invalidTask->setException($e);
@@ -78,7 +80,7 @@ class ConsoleTasker
         }
 
         if ($valid) {
-            return $task;
+            return $task->setIO($this->input, $this->output);
         }
 
         Summary::instance()->addInvalidTask($invalidTask);
