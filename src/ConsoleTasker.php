@@ -51,7 +51,7 @@ class ConsoleTasker
                 $this->processTask($this->resolveTask($class));
             }
         } catch (Throwable $e) {
-            // catch exception to throw later
+            $e = $e instanceof StoppingTaskException ? null : $e;
         }
 
         $this->printer->printSummary();

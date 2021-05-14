@@ -13,6 +13,20 @@ use RuntimeException;
 abstract class AbstractCreatorTask extends AbstractFilesManipulatorTask
 {
     /**
+     * The file to create.
+     *
+     * @var ManipulatedFile
+     */
+    protected $file;
+
+    /**
+     * Whether this task should be skipped if the file to create already exists.
+     *
+     * @var bool
+     */
+    protected $shouldBeSkippedIfFileExists = true;
+
+    /**
      * Retrieve the path of the stub
      *
      * @return string
@@ -26,19 +40,20 @@ abstract class AbstractCreatorTask extends AbstractFilesManipulatorTask
      */
     public function run()
     {
-        $file = $this->file($this->getPath());
+        $this->file = $this->file($this->getPath());
 
         if ($reason = $this->needsManualUpdateTo()) {
-            $file->needsManualUpdateTo($reason);
+            $this->file->needsManualUpdateTo($reason);
         }
 
-        if ($this->canCreateFile($file)) {
-            return $this->createFile($file);
+        if ($this->canCreateFile()) {
+            return $this->createFile();
         }
 
-        $this->setError($this->getCreationError($file));
-
-        return false;
+        if (!$this->shouldBeSkippedIfFileExists()) {
+            $this->setError($this->getCreationError());
+            return false;
+        }
     }
 
     /**
@@ -82,38 +97,35 @@ abstract class AbstractCreatorTask extends AbstractFilesManipulatorTask
     /**
      * Determine whether the file can be created
      *
-     * @param ManipulatedFile $file
      * @return bool
      */
-    protected function canCreateFile(ManipulatedFile $file): bool
+    protected function canCreateFile(): bool
     {
         if ($this->hasOption('force') && $this->option('force')) {
             return true;
         }
 
-        return !file_exists($file->getPath());
+        return !file_exists($this->getPath());
     }
 
     /**
      * Retrieve the reason why the file could not be created
      *
-     * @param ManipulatedFile $file
      * @return string
      */
-    protected function getCreationError(ManipulatedFile $file): string
+    protected function getCreationError(): string
     {
-        return 'The file ' . basename($file->getPath()) . ' already exists';
+        return 'the file ' . basename($this->getPath()) . ' already exists';
     }
 
     /**
      * Create the file
      *
-     * @param ManipulatedFile $file
      * @return bool
      */
-    protected function createFile(ManipulatedFile $file): bool
+    protected function createFile(): bool
     {
-        $path = $file->getPath();
+        $path = $this->getPath();
 
         if (!is_dir(dirname($path))) {
             @mkdir(dirname($path), 0777, true);
@@ -153,5 +165,35 @@ abstract class AbstractCreatorTask extends AbstractFilesManipulatorTask
     protected function getReplacements(): array
     {
         return [];
+    }
+
+    /**
+     * Determine whether this task should run
+     *
+     * @return bool
+     */
+    public function shouldRun(): bool
+    {
+        return !file_exists($this->getPath()) || !$this->shouldBeSkippedIfFileExists();
+    }
+
+    /**
+     * Determine whether this task should be skipped if the file to create already exists
+     *
+     * @return bool
+     */
+    protected function shouldBeSkippedIfFileExists(): bool
+    {
+        return $this->shouldBeSkippedIfFileExists;
+    }
+
+    /**
+     * Retrieve the reason why this task should not run
+     *
+     * @return string|null
+     */
+    public function getSkippingReason(): ?string
+    {
+        return $this->getCreationError();
     }
 }
