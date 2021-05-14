@@ -2,8 +2,9 @@
 
 namespace Cerbero\ConsoleTasker;
 
-use Cerbero\ConsoleTasker\Traits\AddsLines;
+use Cerbero\ConsoleTasker\Traits;
 use Illuminate\Container\Container;
+use Illuminate\Support\Traits\Macroable;
 
 /**
  * The manipulated file.
@@ -11,7 +12,9 @@ use Illuminate\Container\Container;
  */
 class ManipulatedFile
 {
-    use AddsLines;
+    use Macroable;
+    use Traits\AddsLines;
+    use Traits\AddsStubs;
 
     /**
      * The file path.
