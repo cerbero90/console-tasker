@@ -2,7 +2,7 @@
 
 namespace Cerbero\ConsoleTasker\Traits;
 
-use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Config;
 
 /**
  * The config aware trait.
@@ -19,9 +19,6 @@ trait ConfigAware
      */
     protected function config(string $key, $default = null)
     {
-        /** @var \Illuminate\Contracts\Config\Repository */
-        $config = Container::getInstance()->make('config');
-
-        return $config->get("console_tasker.$key", $default);
+        return Config::get("console_tasker.$key", $default);
     }
 }
