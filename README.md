@@ -3,6 +3,7 @@
 [![Author][ico-author]][link-author]
 [![PHP Version][ico-php]][link-php]
 [![Laravel Version][ico-laravel]][link-laravel]
+[![Octane Compatibility][ico-octane]][link-octane]
 [![Build Status][ico-actions]][link-actions]
 [![Coverage Status][ico-scrutinizer]][link-scrutinizer]
 [![Quality Score][ico-code-quality]][link-code-quality]
@@ -61,6 +62,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [ico-author]: https://img.shields.io/static/v1?label=author&message=cerbero90&color=50ABF1&logo=twitter&style=flat-square
 [ico-php]: https://img.shields.io/packagist/php-v/cerbero/console-tasker?color=%234F5B93&logo=php&style=flat-square
 [ico-laravel]: https://img.shields.io/static/v1?label=laravel&message=%E2%89%A55.5&color=ff2d20&logo=laravel&style=flat-square
+[ico-octane]: https://img.shields.io/static/v1?label=octane&message=compatible&color=ff2d20&logo=laravel&style=flat-square
 [ico-version]: https://img.shields.io/packagist/v/cerbero/console-tasker.svg?label=version&style=flat-square
 [ico-actions]: https://img.shields.io/github/workflow/status/cerbero90/console-tasker/build?style=flat-square&logo=github
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
@@ -72,6 +74,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [link-author]: https://twitter.com/cerbero90
 [link-php]: https://www.php.net
 [link-laravel]: https://laravel.com
+[link-octane]: https://github.com/laravel/octane
 [link-packagist]: https://packagist.org/packages/cerbero/console-tasker
 [link-actions]: https://github.com/cerbero90/console-tasker/actions?query=workflow%3Abuild
 [link-psr12]: https://www.php-fig.org/psr/psr-12/

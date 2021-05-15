@@ -44,6 +44,8 @@ class ConsoleTasker
      */
     public function runTasks(iterable $tasks): void
     {
+        $summary = Summary::instance();
+
         $this->newLine();
 
         try {
@@ -56,7 +58,11 @@ class ConsoleTasker
 
         $this->printer->printSummary();
 
-        if ($exception = Summary::instance()->getFirstException() ?: $e ?? null) {
+        $exception = $summary->getFirstException() ?: $e ?? null;
+
+        $summary->clear();
+
+        if ($exception) {
             throw $exception;
         }
     }

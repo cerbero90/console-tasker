@@ -84,7 +84,7 @@ class DefaultPrinter implements PrinterInterface
         }
 
         if ($this->output->isDecorated()) {
-            $this->output->write("\033[2K\r"); // delete line
+            $this->output->write("\033[2K\r"); // it deletes the line
         } else {
             $this->newLine();
         }

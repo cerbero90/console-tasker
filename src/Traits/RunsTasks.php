@@ -3,6 +3,7 @@
 namespace Cerbero\ConsoleTasker\Traits;
 
 use Cerbero\ConsoleTasker\ConsoleTasker;
+use Illuminate\Container\Container;
 
 /**
  * The trait to run tasks.
@@ -18,6 +19,6 @@ trait RunsTasks
      */
     protected function runTasks(iterable $tasks): void
     {
-        $this->laravel->make(ConsoleTasker::class)->setIO($this->input, $this->output)->runTasks($tasks);
+        Container::getInstance()->make(ConsoleTasker::class)->setIO($this->input, $this->output)->runTasks($tasks);
     }
 }
