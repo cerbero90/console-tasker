@@ -197,4 +197,20 @@ class Summary
             && empty($this->rolledbackTasks)
             && count($this->executedTasks) == count($this->succeededTasks);
     }
+
+    /**
+     * Clear the summary instance
+     *
+     * @return void
+     */
+    public function clear(): void
+    {
+        static::$instance = null;
+
+        $this->executedTasks = [];
+        $this->succeededTasks = [];
+        $this->failedTasks = [];
+        $this->rolledbackTasks = [];
+        $this->invalidTasks = [];
+    }
 }

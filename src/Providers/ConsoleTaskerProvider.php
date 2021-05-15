@@ -6,6 +6,7 @@ use Cerbero\ConsoleTasker\Console\Commands\MakeConsoleTaskerCommand;
 use Cerbero\ConsoleTasker\Console\Printers\DefaultPrinter;
 use Cerbero\ConsoleTasker\Console\Printers\PrinterInterface;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -52,6 +53,6 @@ class ConsoleTaskerProvider extends ServiceProvider
             return new DefaultPrinter(new OutputStyle(new ArgvInput(), new ConsoleOutput()));
         });
 
-        $this->app->bind(PrinterInterface::class, $this->app->config['console_tasker.printer']);
+        $this->app->bind(PrinterInterface::class, Config::get('console_tasker.printer'));
     }
 }
