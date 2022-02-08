@@ -144,8 +144,8 @@ abstract class FileCreator extends FilesEditor
      */
     protected function getDefaultReplacements(): array
     {
-        $qualified = (string) $this->getFullyQualifiedName();
         $replacements = $this->data->toReplacements();
+        $qualified = (string) $this->getFullyQualifiedName();
         $replacements['{{ class }}'] ??= class_basename($qualified);
         $replacements['{{ namespace }}'] ??= substr($qualified, 0, strrpos($qualified, '\\'));
 
