@@ -2,7 +2,7 @@
 
 namespace Cerbero\ConsoleTasker\Tasks;
 
-use Cerbero\ConsoleTasker\ManipulatedFile;
+use Cerbero\ConsoleTasker\File;
 use RuntimeException;
 
 /**
@@ -14,7 +14,7 @@ abstract class FileCreator extends FilesEditor
     /**
      * The file to create.
      *
-     * @var ManipulatedFile
+     * @var File
      */
     protected $file;
 

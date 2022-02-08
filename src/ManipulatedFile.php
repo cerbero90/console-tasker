@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Traits\Macroable;
 
 /**
- * The manipulated file.
+ * The file to manipulate.
  *
  */
-class ManipulatedFile
+class File
 {
     use Macroable;
     use Concerns\AddsLines;

@@ -93,7 +93,7 @@ class BasicPrinter extends AbstractPrinter
             }
 
             /** @var FilesEditor $task */
-            foreach ($task->getManipulatedFiles() as $file) {
+            foreach ($task->getFiles() as $file) {
                 $array = $file->wasCreated() ? 'created' : 'updated';
                 $$array[] = $file->getRelativePath();
 

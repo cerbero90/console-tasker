@@ -2,7 +2,7 @@
 
 namespace Cerbero\ConsoleTasker\Tasks;
 
-use Cerbero\ConsoleTasker\ManipulatedFile;
+use Cerbero\ConsoleTasker\File;
 
 /**
  * The abstract files manipulator task.
@@ -13,29 +13,29 @@ abstract class FilesEditor extends Task
     /**
      * The files being manipulated.
      *
-     * @var ManipulatedFile[]
+     * @var File[]
      */
-    protected $manipulatedFiles = [];
+    protected $files = [];
 
     /**
      * Retrieve the files being manipulated
      *
-     * @return ManipulatedFile[]
+     * @return File[]
      */
-    public function getManipulatedFiles(): array
+    public function getFiles(): array
     {
-        return $this->manipulatedFiles;
+        return $this->files;
     }
 
     /**
-     * Retrieve an instance of manipulated file with the given path
+     * Retrieve an instance of the file with the given path
      *
      * @param string $path
-     * @return ManipulatedFile
+     * @return File
      */
-    protected function file(string $path): ManipulatedFile
+    protected function file(string $path): File
     {
-        return $this->manipulatedFiles[] = new ManipulatedFile($path);
+        return $this->files[] = new File($path);
     }
 
     /**
@@ -45,7 +45,7 @@ abstract class FilesEditor extends Task
      */
     protected function rollback(): void
     {
-        foreach ($this->getManipulatedFiles() as $file) {
+        foreach ($this->getFiles() as $file) {
             if ($file->wasCreated()) {
                 unlink($file->getPath());
             } else {
