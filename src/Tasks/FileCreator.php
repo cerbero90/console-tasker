@@ -127,7 +127,7 @@ abstract class FileCreator extends FilesEditor
         $path = $this->getPath();
 
         if (!is_dir(dirname($path))) {
-            @mkdir(dirname($path), 0777, true);
+            mkdir(dirname($path), 0777, true);
         }
 
         $replacements = array_merge($this->getDefaultReplacements(), $this->getReplacements());
@@ -144,16 +144,12 @@ abstract class FileCreator extends FilesEditor
      */
     protected function getDefaultReplacements(): array
     {
-        $qualified = $this->getFullyQualifiedName();
-        $class = class_basename($qualified);
-        $namespace = substr($qualified, 0, strrpos($qualified, $class) - 1);
+        $qualified = (string) $this->getFullyQualifiedName();
+        $replacements = $this->data->toReplacements();
+        $replacements['{{ class }}'] ??= class_basename($qualified);
+        $replacements['{{ namespace }}'] ??= substr($qualified, 0, strrpos($qualified, '\\'));
 
-        return [
-            'DummyClass' => $class,
-            '{{ class }}' => $class,
-            'DummyNamespace' => $namespace,
-            '{{ namespace }}' => $namespace,
-        ];
+        return $replacements;
     }
 
     /**
