@@ -1,6 +1,6 @@
 <?php
 
-namespace Cerbero\ConsoleTasker\Traits;
+namespace Cerbero\ConsoleTasker\Concerns;
 
 use Illuminate\Support\Facades\Config;
 
@@ -19,6 +19,6 @@ trait ConfigAware
      */
     protected function config(string $key, $default = null)
     {
-        return Config::get("console_tasker.$key", $default);
+        return Config::get("console_tasker.{$key}", $default);
     }
 }

@@ -4,34 +4,25 @@ namespace Cerbero\ConsoleTasker\Console\Tasks;
 
 use Cerbero\ConsoleTasker\Console\ParsedTask;
 use Cerbero\ConsoleTasker\Console\TasksParser;
-use Cerbero\ConsoleTasker\Tasks\AbstractCreatorTask;
-use Cerbero\ConsoleTasker\Traits\ConfigAware;
-use Illuminate\Container\Container;
+use Cerbero\ConsoleTasker\Tasks\FileCreator;
+use Cerbero\ConsoleTasker\Concerns\ConfigAware;
 use Illuminate\Support\Str;
 
 /**
  * The task to create the Artisan command.
  *
  */
-class CreateCommand extends AbstractCreatorTask
+class CreateCommand extends FileCreator
 {
     use ConfigAware;
-
-    /**
-     * The tasks parser.
-     *
-     * @var TasksParser
-     */
-    protected $parser;
 
     /**
      * Instantiate the class.
      *
      * @param TasksParser $parser
      */
-    public function __construct(TasksParser $parser)
+    public function __construct(protected TasksParser $parser)
     {
-        $this->parser = $parser;
     }
 
     /**
@@ -52,7 +43,7 @@ class CreateCommand extends AbstractCreatorTask
     protected function getFullyQualifiedName(): ?string
     {
         $name = str_replace('/', '\\', $this->argument('name'));
-        $namespace = Container::getInstance()->make('app')->getNamespace();
+        $namespace = $this->app->getNamespace();
 
         if (Str::startsWith($name, $namespace)) {
             return $name;
@@ -143,7 +134,7 @@ class CreateCommand extends AbstractCreatorTask
         }
 
         $namespace = vsprintf('%s%s\%s', [
-            Container::getInstance()->make('app')->getNamespace(),
+            $this->app->getNamespace(),
             str_replace('/', '\\', $this->config('tasks_directory')),
             $this->argument('name'),
         ]);

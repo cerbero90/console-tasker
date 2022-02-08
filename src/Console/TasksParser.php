@@ -3,7 +3,7 @@
 namespace Cerbero\ConsoleTasker\Console;
 
 use Cerbero\ConsoleTasker\Tasks;
-use Cerbero\ConsoleTasker\Traits\ConfigAware;
+use Cerbero\ConsoleTasker\Concerns\ConfigAware;
 use Illuminate\Support\Str;
 
 /**
@@ -20,8 +20,8 @@ class TasksParser
      * @var array
      */
     protected $parentClassMap = [
-        'c' => Tasks\AbstractCreatorTask::class,
-        'u' => Tasks\AbstractFilesManipulatorTask::class,
+        'c' => Tasks\FileCreator::class,
+        'u' => Tasks\FilesEditor::class,
     ];
 
     /**
@@ -55,7 +55,7 @@ class TasksParser
         $segments = explode(':', $rawTask);
 
         if ($key = $segments[1] ?? null) {
-            return $this->parentClassMap[$key] ?? Tasks\AbstractTask::class;
+            return $this->parentClassMap[$key] ?? Tasks\Task::class;
         }
 
         foreach ($this->config('verbs') as $class => $verbs) {
@@ -64,6 +64,6 @@ class TasksParser
             }
         }
 
-        return Tasks\AbstractTask::class;
+        return Tasks\Task::class;
     }
 }

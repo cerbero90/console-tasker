@@ -1,6 +1,6 @@
 <?php
 
-namespace Cerbero\ConsoleTasker\Traits;
+namespace Cerbero\ConsoleTasker\Concerns;
 
 use Illuminate\Console\Concerns\InteractsWithIO;
 use Illuminate\Console\OutputStyle;
@@ -15,13 +15,13 @@ trait IOAware
     use InteractsWithIO;
 
     /**
-     * Set console input and output.
+     * Set the console input and output fluently.
      *
      * @param InputInterface $input
      * @param OutputStyle $output
-     * @return self
+     * @return static
      */
-    public function setIO(InputInterface $input, OutputStyle $output): self
+    public function setIO(InputInterface $input, OutputStyle $output): static
     {
         $this->setInput($input);
         $this->setOutput($output);

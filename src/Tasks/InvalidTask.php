@@ -6,23 +6,15 @@ namespace Cerbero\ConsoleTasker\Tasks;
  * An invalid task.
  *
  */
-class InvalidTask extends AbstractTask
+class InvalidTask extends Task
 {
     /**
-     * The invalid task class.
-     *
-     * @var string
-     */
-    protected $class;
-
-    /**
-     * Construct the class
+     * Instantiate the class
      *
      * @param string $class
      */
-    public function __construct(string $class)
+    public function __construct(protected string $class)
     {
-        $this->class = $class;
     }
 
     /**
@@ -36,7 +28,7 @@ class InvalidTask extends AbstractTask
     }
 
     /**
-     * Set the invalid task class
+     * Retrieve the invalid task class
      *
      * @param string $class
      * @return self
@@ -73,10 +65,10 @@ class InvalidTask extends AbstractTask
     /**
      * Determine whether this task should rollback if the given task fails
      *
-     * @param AbstractTask|null $task
+     * @param Task $task
      * @return bool
      */
-    public function shouldRollbackDueTo(?AbstractTask $task): bool
+    public function shouldRollbackDueTo(Task $task): bool
     {
         return false;
     }

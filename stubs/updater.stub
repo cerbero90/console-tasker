@@ -2,13 +2,13 @@
 
 namespace {{ namespace }};
 
-use Cerbero\ConsoleTasker\Tasks\AbstractFilesManipulatorTask;
+use Cerbero\ConsoleTasker\Tasks\FilesEditor;
 
 /**
  * The task to {{ purpose }}.
  *
  */
-class {{ class }} extends AbstractFilesManipulatorTask
+class {{ class }} extends FilesEditor
 {
     /**
      * Run the task

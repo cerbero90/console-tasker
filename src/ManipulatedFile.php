@@ -2,8 +2,8 @@
 
 namespace Cerbero\ConsoleTasker;
 
-use Cerbero\ConsoleTasker\Traits;
-use Illuminate\Container\Container;
+use Cerbero\ConsoleTasker\Concerns;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Traits\Macroable;
 
 /**
@@ -13,15 +13,8 @@ use Illuminate\Support\Traits\Macroable;
 class ManipulatedFile
 {
     use Macroable;
-    use Traits\AddsLines;
-    use Traits\AddsStubs;
-
-    /**
-     * The file path.
-     *
-     * @var string
-     */
-    protected $path;
+    use Concerns\AddsLines;
+    use Concerns\AddsStubs;
 
     /**
      * Whether the file was created.
@@ -49,9 +42,8 @@ class ManipulatedFile
      *
      * @param string $path
      */
-    public function __construct(string $path)
+    public function __construct(protected string $path)
     {
-        $this->path = $path;
         $this->wasCreated = !file_exists($path);
         $this->originalContent = $this->wasCreated ? null : file_get_contents($path);
     }
@@ -73,7 +65,7 @@ class ManipulatedFile
      */
     public function getRelativePath(): string
     {
-        $basePath = Container::getInstance()->make('path.base');
+        $basePath = App::basePath();
 
         return substr($this->path, strlen($basePath) + 1);
     }
@@ -124,7 +116,7 @@ class ManipulatedFile
      * @param string $reason
      * @return self
      */
-    public function needsManualUpdateTo(string $reason): self
+    public function needsManualUpdateTo(string $reason): static
     {
         $this->manualUpdateReason = $reason;
 

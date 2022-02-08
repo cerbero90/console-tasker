@@ -2,7 +2,7 @@
 
 namespace Cerbero\ConsoleTasker\Exceptions;
 
-use Cerbero\ConsoleTasker\Tasks\AbstractTask;
+use Cerbero\ConsoleTasker\Tasks\Task;
 use RuntimeException;
 
 /**
@@ -12,30 +12,21 @@ use RuntimeException;
 class StoppingTaskException extends RuntimeException
 {
     /**
-     * The failed task.
-     *
-     * @var AbstractTask
-     */
-    protected $task;
-
-    /**
      * Instantiate the class.
      *
-     * @param AbstractTask $task
+     * @param Task $task
      */
-    public function __construct(AbstractTask $task)
+    public function __construct(protected Task $task)
     {
         parent::__construct($task->getError());
-
-        $this->task = $task;
     }
 
     /**
      * Retrieve the failed task
      *
-     * @return AbstractTask
+     * @return Task
      */
-    public function getTask(): AbstractTask
+    public function getTask(): Task
     {
         return $this->task;
     }

@@ -5,25 +5,17 @@ namespace Cerbero\ConsoleTasker\Console\Tasks;
 use Cerbero\ConsoleTasker\Console\ParsedTask;
 use Cerbero\ConsoleTasker\Console\TasksParser;
 use Cerbero\ConsoleTasker\Tasks;
-use Cerbero\ConsoleTasker\Tasks\AbstractCreatorTask;
-use Cerbero\ConsoleTasker\Traits\ConfigAware;
-use Illuminate\Container\Container;
+use Cerbero\ConsoleTasker\Tasks\FileCreator;
+use Cerbero\ConsoleTasker\Concerns\ConfigAware;
 use Illuminate\Support\Str;
 
 /**
  * The task to create the command tasks.
  *
  */
-class CreateCommandTasks extends AbstractCreatorTask
+class CreateCommandTasks extends FileCreator
 {
     use ConfigAware;
-
-    /**
-     * The tasks parser.
-     *
-     * @var TasksParser
-     */
-    protected $parser;
 
     /**
      * The parsed task to generate.
@@ -38,9 +30,9 @@ class CreateCommandTasks extends AbstractCreatorTask
      * @var array
      */
     protected $stubsMap = [
-        Tasks\AbstractTask::class => __DIR__ . '/../../../stubs/task.stub',
-        Tasks\AbstractCreatorTask::class => __DIR__ . '/../../../stubs/creator.stub',
-        Tasks\AbstractFilesManipulatorTask::class => __DIR__ . '/../../../stubs/updater.stub',
+        Tasks\Task::class => __DIR__ . '/../../../stubs/task.stub',
+        Tasks\FileCreator::class => __DIR__ . '/../../../stubs/creator.stub',
+        Tasks\FilesEditor::class => __DIR__ . '/../../../stubs/updater.stub',
     ];
 
     /**
@@ -48,9 +40,8 @@ class CreateCommandTasks extends AbstractCreatorTask
      *
      * @param TasksParser $parser
      */
-    public function __construct(TasksParser $parser)
+    public function __construct(protected TasksParser $parser)
     {
-        $this->parser = $parser;
     }
 
     /**
@@ -64,7 +55,8 @@ class CreateCommandTasks extends AbstractCreatorTask
 
         foreach ($parsedTasks as $parsedTask) {
             $this->parsedTask = $parsedTask;
-            $succeeded = parent::run() && $this->createStub();
+
+            $succeeded = parent::run() !== false && $this->createStub();
 
             if (!$succeeded) {
                 return false;
@@ -79,7 +71,7 @@ class CreateCommandTasks extends AbstractCreatorTask
      */
     protected function createStub(): bool
     {
-        if ($this->parsedTask->parentClass != AbstractCreatorTask::class) {
+        if ($this->parsedTask->parentClass != FileCreator::class) {
             return true;
         }
 
@@ -87,7 +79,7 @@ class CreateCommandTasks extends AbstractCreatorTask
         $this->file($path)->needsManualUpdateTo('add stub content');
 
         if (!is_dir(dirname($path))) {
-            @mkdir(dirname($path), 0777, true);
+            mkdir(dirname($path), 0777, true);
         }
 
         return file_put_contents($path, '') !== false;
@@ -100,7 +92,7 @@ class CreateCommandTasks extends AbstractCreatorTask
      */
     public function shouldRun(): bool
     {
-        return !!$this->option('tasks');
+        return $this->option('tasks') !== null;
     }
 
     /**
@@ -131,7 +123,7 @@ class CreateCommandTasks extends AbstractCreatorTask
     protected function getFullyQualifiedName(): ?string
     {
         return vsprintf('%s%s\%s\%s', [
-            Container::getInstance()->make('app')->getNamespace(),
+            $this->app->getNamespace(),
             str_replace('/', '\\', $this->config('tasks_directory')),
             $this->argument('name'),
             $this->parsedTask->name,

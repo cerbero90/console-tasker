@@ -2,13 +2,13 @@
 
 namespace {{ namespace }};
 
-use Cerbero\ConsoleTasker\Tasks\AbstractTask;
+use Cerbero\ConsoleTasker\Tasks\Task;
 
 /**
  * The task to {{ purpose }}.
  *
  */
-class {{ class }} extends AbstractTask
+class {{ class }} extends Task
 {
     /**
      * Run the task

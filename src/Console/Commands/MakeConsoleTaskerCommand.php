@@ -4,7 +4,7 @@ namespace Cerbero\ConsoleTasker\Console\Commands;
 
 use Cerbero\ConsoleTasker\Console\Tasks\CreateCommand;
 use Cerbero\ConsoleTasker\Console\Tasks\CreateCommandTasks;
-use Cerbero\ConsoleTasker\Traits\RunsTasks;
+use Cerbero\ConsoleTasker\Concerns\RunsTasks;
 use Illuminate\Console\Command;
 
 /**
@@ -35,13 +35,10 @@ class MakeConsoleTaskerCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
-        $this->runTasks([
-            CreateCommand::class,
-            CreateCommandTasks::class,
-        ]);
+        return $this->runTasks(CreateCommand::class, CreateCommandTasks::class);
     }
 }

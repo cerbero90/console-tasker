@@ -2,7 +2,7 @@
 
 namespace Cerbero\ConsoleTasker;
 
-use Cerbero\ConsoleTasker\Tasks\AbstractTask;
+use Cerbero\ConsoleTasker\Tasks\Task;
 
 /**
  * The rollback scope.
@@ -11,28 +11,12 @@ use Cerbero\ConsoleTasker\Tasks\AbstractTask;
 class RollbackScope
 {
     /**
-     * The rolledback task.
-     *
-     * @var AbstractTask
-     */
-    public $rolledbackTask;
-
-    /**
-     * The failed task.
-     *
-     * @var AbstractTask
-     */
-    public $failedTask;
-
-    /**
      * Instantiate the class.
      *
-     * @param AbstractTask $rolledbackTask
-     * @param AbstractTask $failedTask
+     * @param Task $rolledbackTask
+     * @param Task $failedTask
      */
-    public function __construct(AbstractTask $rolledbackTask, AbstractTask $failedTask)
+    public function __construct(public Task $rolledbackTask, public Task $failedTask)
     {
-        $this->rolledbackTask = $rolledbackTask;
-        $this->failedTask = $failedTask;
     }
 }

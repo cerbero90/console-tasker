@@ -2,13 +2,13 @@
 
 namespace {{ namespace }};
 
-use Cerbero\ConsoleTasker\Tasks\AbstractCreatorTask;
+use Cerbero\ConsoleTasker\Tasks\FileCreator;
 
 /**
  * The task to {{ purpose }}.
  *
  */
-class {{ class }} extends AbstractCreatorTask
+class {{ class }} extends FileCreator
 {
     /**
      * Retrieve the path of the stub

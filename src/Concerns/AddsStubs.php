@@ -1,6 +1,6 @@
 <?php
 
-namespace Cerbero\ConsoleTasker\Traits;
+namespace Cerbero\ConsoleTasker\Concerns;
 
 /**
  * The trait to manipulate files by adding new stubs.
@@ -16,7 +16,7 @@ trait AddsStubs
      * @param array $replacements
      * @return self
      */
-    public function addStubBeforeLast(string $search, string $path, array $replacements = []): self
+    public function addStubBeforeLast(string $search, string $path, array $replacements = []): static
     {
         $regex = "/{$search}(?!.*{$search})/s";
 
@@ -31,7 +31,7 @@ trait AddsStubs
      * @param array $replacements
      * @return self
      */
-    public function addStubBeforeRegex(string $regex, string $path, array $replacements = []): self
+    public function addStubBeforeRegex(string $regex, string $path, array $replacements = []): static
     {
         return $this->addStubByRegex($regex, $path, $replacements, function ($stubContent, $matches) {
             return $stubContent . $matches[0];
@@ -47,7 +47,7 @@ trait AddsStubs
      * @param callable $callable
      * @return self
      */
-    public function addStubByRegex(string $regex, string $path, array $replacements, callable $callable): self
+    public function addStubByRegex(string $regex, string $path, array $replacements, callable $callable): static
     {
         $stubContent = str_replace(array_keys($replacements), array_values($replacements), file_get_contents($path));
 

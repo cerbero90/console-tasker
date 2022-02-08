@@ -1,6 +1,6 @@
 <?php
 
-use Cerbero\ConsoleTasker\Console\Printers\DefaultPrinter;
+use Cerbero\ConsoleTasker\Console\Printers\BasicPrinter;
 use Cerbero\ConsoleTasker\Tasks;
 
 return [
@@ -14,7 +14,7 @@ return [
     | box a default printer is available, but you can set your own below.
     |
     */
-    'printer' => DefaultPrinter::class,
+    'printer' => BasicPrinter::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -26,7 +26,7 @@ return [
     | free to change it if you need tasks to be in a different directory.
     |
     */
-    'tasks_directory' => 'Console/Tasks',
+    'tasks_directory' => app_path('Console/Tasks'),
 
     /*
     |--------------------------------------------------------------------------
@@ -39,7 +39,7 @@ return [
     |
     */
     'verbs' => [
-        Tasks\AbstractCreatorTask::class => ['create', 'generate'],
-        Tasks\AbstractFilesManipulatorTask::class => ['add', 'update'],
+        Tasks\FileCreator::class => ['create', 'generate'],
+        Tasks\FilesEditor::class => ['add', 'update'],
     ]
 ];

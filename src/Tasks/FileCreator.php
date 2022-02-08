@@ -3,14 +3,13 @@
 namespace Cerbero\ConsoleTasker\Tasks;
 
 use Cerbero\ConsoleTasker\ManipulatedFile;
-use Illuminate\Container\Container;
 use RuntimeException;
 
 /**
  * The abstract creator task.
  *
  */
-abstract class AbstractCreatorTask extends AbstractFilesManipulatorTask
+abstract class FileCreator extends FilesEditor
 {
     /**
      * The file to create.
@@ -51,7 +50,7 @@ abstract class AbstractCreatorTask extends AbstractFilesManipulatorTask
         }
 
         if (!$this->shouldBeSkippedIfFileExists()) {
-            $this->setError($this->getCreationError());
+            $this->error = $this->getCreationError();
             return false;
         }
     }
@@ -67,11 +66,11 @@ abstract class AbstractCreatorTask extends AbstractFilesManipulatorTask
             throw new RuntimeException('Please provide a path or a fully qualified name for the file to create');
         }
 
-        if (strpos($name, $namespace = Container::getInstance()->make('app')->getNamespace()) === 0) {
+        if (strpos($name, $namespace = $this->app->getNamespace()) === 0) {
             $name = substr_replace($name, 'app/', 0, strlen($namespace));
         }
 
-        return Container::getInstance()->make('app')->basePath(str_replace('\\', '/', $name)) . '.php';
+        return $this->app->basePath(str_replace('\\', '/', $name)) . '.php';
     }
 
     /**

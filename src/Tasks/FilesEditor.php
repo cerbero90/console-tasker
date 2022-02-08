@@ -8,7 +8,7 @@ use Cerbero\ConsoleTasker\ManipulatedFile;
  * The abstract files manipulator task.
  *
  */
-abstract class AbstractFilesManipulatorTask extends AbstractTask
+abstract class FilesEditor extends Task
 {
     /**
      * The files being manipulated.
@@ -39,11 +39,11 @@ abstract class AbstractFilesManipulatorTask extends AbstractTask
     }
 
     /**
-     * Revert this task
+     * Rollback this task
      *
      * @return void
      */
-    protected function revert(): void
+    protected function rollback(): void
     {
         foreach ($this->getManipulatedFiles() as $file) {
             if ($file->wasCreated()) {

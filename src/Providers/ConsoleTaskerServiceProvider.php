@@ -3,8 +3,8 @@
 namespace Cerbero\ConsoleTasker\Providers;
 
 use Cerbero\ConsoleTasker\Console\Commands\MakeConsoleTaskerCommand;
-use Cerbero\ConsoleTasker\Console\Printers\DefaultPrinter;
-use Cerbero\ConsoleTasker\Console\Printers\PrinterInterface;
+use Cerbero\ConsoleTasker\Console\Printers\BasicPrinter;
+use Cerbero\ConsoleTasker\Console\Printers\Printer;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
@@ -12,10 +12,10 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
- * The console tasker provider.
+ * The console tasker service provider.
  *
  */
-class ConsoleTaskerProvider extends ServiceProvider
+class ConsoleTaskerServiceProvider extends ServiceProvider
 {
     /**
      * The configuration file path.
@@ -36,8 +36,12 @@ class ConsoleTaskerProvider extends ServiceProvider
         }
 
         $this->publishes([
-            static::CONFIG => $this->app->configPath('console_tasker.php')
-        ], 'console_tasker');
+            static::CONFIG => $this->app->configPath('console_tasker.php'),
+        ], 'console-tasker');
+
+        $this->publishes([
+            __DIR__ . '/../../stubs' => $this->app->basePath('stubs/console-tasker'),
+        ], 'console-tasker-stubs');
     }
 
     /**
@@ -49,10 +53,10 @@ class ConsoleTaskerProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(static::CONFIG, 'console_tasker');
 
-        $this->app->bind(DefaultPrinter::class, function () {
-            return new DefaultPrinter(new OutputStyle(new ArgvInput(), new ConsoleOutput()));
+        $this->app->bind(BasicPrinter::class, function () {
+            return new BasicPrinter(new OutputStyle(new ArgvInput(), new ConsoleOutput()));
         });
 
-        $this->app->bind(PrinterInterface::class, Config::get('console_tasker.printer'));
+        $this->app->bind(Printer::class, Config::get('console_tasker.printer'));
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Cerbero\ConsoleTasker\Traits;
+namespace Cerbero\ConsoleTasker\Concerns;
 
 /**
  * The trait to manipulate files by adding new lines.
@@ -15,7 +15,7 @@ trait AddsLines
      * @param mixed $line
      * @return self
      */
-    public function addLineAfterLast(string $search, $line): self
+    public function addLineAfterLast(string $search, $line): static
     {
         $newline = PHP_EOL;
         $regex = "/([ \t]*).*{$search}.*{$newline}(?!.*{$search})/";
@@ -30,7 +30,7 @@ trait AddsLines
      * @param mixed $line
      * @return self
      */
-    public function addLineAfterRegex(string $regex, $line): self
+    public function addLineAfterRegex(string $regex, $line): static
     {
         return $this->addLineByRegex($regex, $line, function ($line, $matches) {
             return $matches[0] . $matches[1] . $line . PHP_EOL;
@@ -45,7 +45,7 @@ trait AddsLines
      * @param callable $callable
      * @return self
      */
-    public function addLineByRegex(string $regex, $line, callable $callable): self
+    public function addLineByRegex(string $regex, $line, callable $callable): static
     {
         $callback = function (array $matches) use ($line, $callable) {
             $value = is_callable($line) ? $line($matches) : $line;
@@ -66,7 +66,7 @@ trait AddsLines
      * @param mixed $line
      * @return self
      */
-    public function addLineAfterLastDocblockComment(string $search, $line): self
+    public function addLineAfterLastDocblockComment(string $search, $line): static
     {
         $newline = PHP_EOL;
         $regex = "/([ \t\*]*).*{$search}.*{$newline}(?!.*{$search})/";

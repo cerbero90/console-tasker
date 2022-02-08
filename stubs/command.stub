@@ -2,7 +2,7 @@
 
 namespace {{ namespace }};
 
-{{ namespaces }}use Cerbero\ConsoleTasker\Traits\RunsTasks;
+{{ namespaces }}use Cerbero\ConsoleTasker\Concerns\RunsTasks;
 use Illuminate\Console\Command;
 
 class {{ class }} extends Command
