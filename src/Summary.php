@@ -2,7 +2,8 @@
 
 namespace Cerbero\ConsoleTasker;
 
-use Cerbero\ConsoleTasker\Tasks\AbstractTask;
+use Cerbero\ConsoleTasker\Exceptions\StoppingTaskException;
+use Cerbero\ConsoleTasker\Tasks\Task;
 use Throwable;
 
 /**
@@ -14,51 +15,72 @@ class Summary
     /**
      * The executed tasks.
      *
-     * @var AbstractTask[]
+     * @var Task[]
      */
-    protected $executedTasks = [];
+    protected array $executedTasks = [];
 
     /**
      * The succeeded tasks.
      *
-     * @var AbstractTask[]
+     * @var Task[]
      */
-    protected $succeededTasks = [];
+    protected array $succeededTasks = [];
+
+    /**
+     * The skipped tasks.
+     *
+     * @var Task[]
+     */
+    protected array $skippedTasks = [];
 
     /**
      * The failed tasks.
      *
-     * @var AbstractTask[]
+     * @var Task[]
      */
-    protected $failedTasks = [];
+    protected array $failedTasks = [];
 
     /**
      * The rolledback tasks.
      *
-     * @var AbstractTask[]
+     * @var RollbackScope[]
      */
-    protected $rolledbackTasks = [];
+    protected array $rolledbackTasks = [];
+
+    /**
+     * The succeeded rollbacks.
+     *
+     * @var RollbackScope[]
+     */
+    protected array $succeededRollbacks = [];
+
+    /**
+     * The failed rollbacks.
+     *
+     * @var RollbackScope[]
+     */
+    protected array $failedRollbacks = [];
 
     /**
      * The invalid tasks.
      *
      * @var array
      */
-    protected $invalidTasks = [];
+    protected array $invalidTasks = [];
 
     /**
-     * The first exception ever thrown.
+     * The exceptions thrown.
      *
-     * @var Throwable|null
+     * @var Throwable[]
      */
-    protected $firstException;
+    protected array $exceptions = [];
 
     /**
      * The summary instance.
      *
-     * @var self
+     * @var self|null
      */
-    protected static $instance;
+    protected static ?self $instance;
 
     /**
      * Disable class instantiation in favor of singleton
@@ -74,15 +96,75 @@ class Summary
      *
      * @return self
      */
-    public static function instance(): self
+    public static function instance(): static
     {
-        return static::$instance = static::$instance ?: new static();
+        return static::$instance ??= new static();
+    }
+
+    /**
+     * Add the given executed task
+     *
+     * @param Task $task
+     * @return self
+     */
+    public function addExecutedTask(Task $task): static
+    {
+        $this->executedTasks[] = $task;
+
+        return match (true) {
+            $task->succeeded() => $this->addSucceededTask($task),
+            $task->wasSkipped() => $this->addSkippedTask($task),
+            !$task->succeeded() => $this->addFailedTask($task),
+        };
+    }
+
+    /**
+     * Add the given succeeded task
+     *
+     * @param Task $task
+     * @return self
+     */
+    protected function addSucceededTask(Task $task): static
+    {
+        $this->succeededTasks[] = $task;
+
+        return $this;
+    }
+
+    /**
+     * Add the given skipped task
+     *
+     * @param Task $task
+     * @return self
+     */
+    protected function addSkippedTask(Task $task): static
+    {
+        $this->skippedTasks[] = $task;
+
+        return $this;
+    }
+
+    /**
+     * Add the given failed task
+     *
+     * @param Task $task
+     * @return self
+     */
+    protected function addFailedTask(Task $task): static
+    {
+        $this->failedTasks[] = $task;
+
+        if ($exception = $task->getException()) {
+            $this->addException($exception);
+        }
+
+        return $this;
     }
 
     /**
      * Retrieve the executed tasks
      *
-     * @return array
+     * @return Task[]
      */
     public function getExecutedTasks(): array
     {
@@ -92,7 +174,7 @@ class Summary
     /**
      * Retrieve the succeeded tasks
      *
-     * @return array
+     * @return Task[]
      */
     public function getSucceededTasks(): array
     {
@@ -100,9 +182,19 @@ class Summary
     }
 
     /**
+     * Retrieve the skipped tasks
+     *
+     * @return Task[]
+     */
+    public function getSkippedTasks(): array
+    {
+        return $this->skippedTasks;
+    }
+
+    /**
      * Retrieve the failed tasks
      *
-     * @return array
+     * @return Task[]
      */
     public function getFailedTasks(): array
     {
@@ -110,9 +202,29 @@ class Summary
     }
 
     /**
+     * Add the given rolledback task due to the provided failed task
+     *
+     * @param Task $task
+     * @param Task $failedTask
+     * @return self
+     */
+    public function addRolledbackTask(Task $task, Task $failedTask): static
+    {
+        $this->rolledbackTasks[] = new RollbackScope($task, $failedTask);
+
+        if ($task->rolledback()) {
+            $this->succeededRollbacks[] = new RollbackScope($task, $failedTask);
+        } else {
+            $this->failedRollbacks[] = new RollbackScope($task, $failedTask);
+        }
+
+        return $this;
+    }
+
+    /**
      * Retrieve the rolledback tasks
      *
-     * @return array
+     * @return RollbackScope[]
      */
     public function getRolledbackTasks(): array
     {
@@ -120,13 +232,71 @@ class Summary
     }
 
     /**
+     * Retrieve the succeeded rollbacks
+     *
+     * @return RollbackScope[]
+     */
+    public function getSucceededRollbacks(): array
+    {
+        return $this->succeededRollbacks;
+    }
+
+    /**
+     * Retrieve the failed rollbacks
+     *
+     * @return RollbackScope[]
+     */
+    public function getFailedRollbacks(): array
+    {
+        return $this->failedRollbacks;
+    }
+
+    /**
+     * Add the given item to the invalid tasks
+     *
+     * @param Task $task
+     * @return self
+     */
+    public function addInvalidTask(Task $task): static
+    {
+        $this->invalidTasks[] = $task;
+
+        return $this;
+    }
+
+    /**
      * Retrieve the invalid tasks
      *
-     * @return array
+     * @return Task[]
      */
     public function getInvalidTasks(): array
     {
         return $this->invalidTasks;
+    }
+
+    /**
+     * Add the given exception
+     *
+     * @param Throwable $e
+     * @return static
+     */
+    public function addException(Throwable $e): static
+    {
+        if (!$e instanceof StoppingTaskException) {
+            $this->exceptions[] = $e;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Retrieve the exceptions thrown
+     *
+     * @return Throwable[]
+     */
+    public function getExceptions(): array
+    {
+        return $this->exceptions;
     }
 
     /**
@@ -136,54 +306,7 @@ class Summary
      */
     public function getFirstException(): ?Throwable
     {
-        return $this->firstException;
-    }
-
-    /**
-     * Add the given task to the successfully executed tasks
-     *
-     * @param AbstractTask $task
-     * @return self
-     */
-    public function addExecutedTask(AbstractTask $task): self
-    {
-        $this->executedTasks[] = $task;
-
-        if ($task->succeeded()) {
-            $this->succeededTasks[] = $task;
-        } else {
-            $this->failedTasks[] = $task;
-            $this->firstException = $this->firstException ?: $task->getException();
-        }
-
-        return $this;
-    }
-
-    /**
-     * Add the given rolledback task due to the provided failed task
-     *
-     * @param AbstractTask $task
-     * @param AbstractTask $failedTask
-     * @return self
-     */
-    public function addRolledbackTask(AbstractTask $task, AbstractTask $failedTask): self
-    {
-        $this->rolledbackTasks[] = new RollbackScope($task, $failedTask);
-
-        return $this;
-    }
-
-    /**
-     * Add the given item to the invalid tasks
-     *
-     * @param AbstractTask $task
-     * @return self
-     */
-    public function addInvalidTask(AbstractTask $task): self
-    {
-        $this->invalidTasks[] = $task;
-
-        return $this;
+        return $this->exceptions[0] ?? null;
     }
 
     /**
@@ -195,7 +318,7 @@ class Summary
     {
         return empty($this->failedTasks)
             && empty($this->rolledbackTasks)
-            && count($this->executedTasks) == count($this->succeededTasks);
+            && count($this->executedTasks) == count($this->succeededTasks) + count($this->skippedTasks);
     }
 
     /**
@@ -205,12 +328,16 @@ class Summary
      */
     public function clear(): void
     {
-        static::$instance = null;
-
         $this->executedTasks = [];
         $this->succeededTasks = [];
+        $this->skippedTasks = [];
         $this->failedTasks = [];
         $this->rolledbackTasks = [];
+        $this->succeededRollbacks = [];
+        $this->failedRollbacks = [];
         $this->invalidTasks = [];
+        $this->exceptions = [];
+
+        static::$instance = null;
     }
 }

@@ -2,12 +2,13 @@
 
 namespace Cerbero\ConsoleTasker;
 
-use Cerbero\ConsoleTasker\Console\Printers\PrinterInterface;
+use Cerbero\ConsoleTasker\Concerns\DataAware;
+use Cerbero\ConsoleTasker\Concerns\IOAware;
+use Cerbero\ConsoleTasker\Console\Printers\Printer;
 use Cerbero\ConsoleTasker\Exceptions\StoppingTaskException;
-use Cerbero\ConsoleTasker\Tasks\AbstractTask;
 use Cerbero\ConsoleTasker\Tasks\InvalidTask;
-use Cerbero\ConsoleTasker\Traits\IOAware;
-use Illuminate\Container\Container;
+use Cerbero\ConsoleTasker\Tasks\Task;
+use Illuminate\Contracts\Foundation\Application;
 use Throwable;
 
 /**
@@ -16,157 +17,120 @@ use Throwable;
  */
 class ConsoleTasker
 {
+    use DataAware;
     use IOAware;
-
-    /**
-     * The console printer.
-     *
-     * @var PrinterInterface
-     */
-    protected $printer;
 
     /**
      * Instantiate the class.
      *
-     * @param PrinterInterface $printer
+     * @param Application $app
+     * @param Printer $printer
      */
-    public function __construct(PrinterInterface $printer)
+    public function __construct(protected Application $app, protected Printer $printer)
     {
-        $this->printer = $printer;
     }
 
     /**
      * Run the given tasks
      *
-     * @param iterable $tasks
-     * @return void
-     * @throws Throwable
+     * @param string ...$tasks
+     * @return bool
      */
-    public function runTasks(iterable $tasks): void
+    public function runTasks(string ...$tasks): bool
     {
         $summary = Summary::instance();
 
-        $this->newLine();
-
         try {
-            foreach ($tasks as $class) {
-                $this->processTask($this->resolveTask($class));
+            foreach ($tasks as $task) {
+                $this->processTask($this->resolveTask($task));
             }
         } catch (Throwable $e) {
-            $e = $e instanceof StoppingTaskException ? null : $e;
+            dump($e->getMessage());
+            $summary->addException($e);
         }
 
-        $this->printer->printSummary();
+        $this->printer->printSummary($summary);
 
-        $exception = $summary->getFirstException() ?: $e ?? null;
-
-        $summary->clear();
-
-        if ($exception) {
-            throw $exception;
-        }
+        return $summary->succeeded();
     }
 
     /**
      * Retrieve the resolved instance of the given task class
      *
      * @param string $class
-     * @return AbstractTask
+     * @return Task
      */
-    protected function resolveTask(string $class): AbstractTask
+    protected function resolveTask(string $class): Task
     {
-        $invalidTask = new InvalidTask($class);
+        $isValid = false;
+        $task = new InvalidTask($class);
 
         try {
-            $task = Container::getInstance()->make($class);
-            $valid = $task instanceof AbstractTask;
+            /** @var Task $task */
+            $task = $this->app->make($class);
+            $isValid = $task instanceof Task;
         } catch (Throwable $e) {
-            $invalidTask->setException($e);
-            $valid = false;
+            $task->setException($e);
         }
 
-        if ($valid) {
-            return $task->setIO($this->input, $this->output);
+        if ($isValid) {
+            return $task->setIO($this->input, $this->output)->setApp($this->app)->setData($this->getData());
         }
 
-        Summary::instance()->addInvalidTask($invalidTask);
+        Summary::instance()->addInvalidTask($task);
 
-        return $invalidTask;
+        return $task;
     }
 
     /**
      * Process the given task
      *
-     * @param AbstractTask $task
+     * @param Task $task
      * @return bool
-     * @throws Throwable
      */
-    protected function processTask(AbstractTask $task): bool
+    protected function processTask(Task $task): bool
     {
-        $this->printer->printRunningTask($task, function (AbstractTask $task) {
-            $this->runTask($task);
-        });
+        $this->printer->printRunningTask($task);
 
-        if (!$task->shouldRun()) {
-            return false;
-        }
+        $succeeded = $task->perform();
 
         Summary::instance()->addExecutedTask($task);
 
-        if (!$task->succeeded()) {
+        $this->printer->printRunTask($task);
+
+        if ($task->failed()) {
             $this->handleFailedTask($task);
         }
 
-        return $task->succeeded();
-    }
-
-    /**
-     * Run the given task
-     *
-     * @param AbstractTask $task
-     * @return void
-     */
-    protected function runTask(AbstractTask $task): void
-    {
-        if (!$task->shouldRun()) {
-            return;
-        }
-
-        try {
-            $task->setResult($task->run() !== false);
-        } catch (Throwable $e) {
-            $task->setException($e);
-            $task->setError($e->getMessage());
-            $task->setResult(false);
-        }
+        return $succeeded;
     }
 
     /**
      * Handle the given failed task
      *
-     * @param AbstractTask $task
+     * @param Task $failedTask
      * @return void
      * @throws Throwable
      */
-    protected function handleFailedTask(AbstractTask $task): void
+    protected function handleFailedTask(Task $failedTask): void
     {
         $succeededTasks = Summary::instance()->getSucceededTasks();
 
-        $this->rollbackTasksDueTo($succeededTasks, $task);
+        $this->rollbackTasksDueTo($failedTask, $succeededTasks);
 
-        if ($task->stopsSuccessiveTasksOnFailure()) {
-            throw $task->getException() ?: new StoppingTaskException($task);
+        if ($failedTask->stopsOnFailure()) {
+            throw $failedTask->getException() ?: new StoppingTaskException($failedTask);
         }
     }
 
     /**
      * Rollback the given tasks due to the provided failed task
      *
-     * @param AbstractTask[] $tasks
-     * @param AbstractTask $failedTask
+     * @param Task $failedTask
+     * @param Task[] $tasks
      * @return void
      */
-    protected function rollbackTasksDueTo(array $tasks, AbstractTask $failedTask): void
+    protected function rollbackTasksDueTo(Task $failedTask, array $tasks): void
     {
         if (empty($tasks)) {
             return;
@@ -175,29 +139,25 @@ class ConsoleTasker
         $task = array_pop($tasks);
 
         if (!$task->ranRollback() && $task->shouldRollbackDueTo($failedTask)) {
-            $this->rollbackTask($task);
+            $task->revert();
+
             Summary::instance()->addRolledbackTask($task, $failedTask);
 
             if ($task->rolledback()) {
-                $this->rollbackTasksDueTo($tasks, $task);
+                $this->rollbackTasksDueTo($task, $tasks);
             }
         }
 
-        $this->rollbackTasksDueTo($tasks, $failedTask);
+        $this->rollbackTasksDueTo($failedTask, $tasks);
     }
 
     /**
-     * Rollback the given task
+     * Handle the instance destruction
      *
-     * @param AbstractTask $task
      * @return void
      */
-    protected function rollbackTask(AbstractTask $task): void
+    public function __destruct()
     {
-        try {
-            $task->rollback();
-        } catch (Throwable $e) {
-            $task->setRollbackException($e);
-        }
+        Summary::instance()->clear();
     }
 }
