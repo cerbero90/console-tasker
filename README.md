@@ -1,4 +1,4 @@
-# Console Tasker
+# 🦾 Console Tasker
 
 [![Author][ico-author]][link-author]
 [![PHP Version][ico-php]][link-php]
@@ -15,7 +15,7 @@
 Laravel package to run and manage tasks in Artisan commands.
 
 
-## Install
+## 📦 Install
 
 Via Composer
 
@@ -23,45 +23,42 @@ Via Composer
 composer require cerbero/console-tasker
 ```
 
-## Usage
+## 🔮 Usage
 
-To do:
-1. document package usage in `README.md`
-1. add tests
-1. enable scheduled builds in `.github/workflows/build.yml`
-1. fix some builds that are currently failing and remove last matrix "exclude"
-1. add AbstractTask method to show information after the ✔ sign
+```php
+// WIP
+```
 
-## Change log
+## 📆 Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
-## Testing
+## 🧪 Testing
 
 ``` bash
 composer test
 ```
 
-## Contributing
+## 💞 Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) and [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md) for details.
 
-## Security
+## 🧯 Security
 
 If you discover any security related issues, please email andrea.marco.sartori@gmail.com instead of using the issue tracker.
 
-## Credits
+## 🏅 Credits
 
 - [Andrea Marco Sartori][link-author]
 - [All Contributors][link-contributors]
 
-## License
+## ⚖️ License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
 [ico-author]: https://img.shields.io/static/v1?label=author&message=cerbero90&color=50ABF1&logo=twitter&style=flat-square
 [ico-php]: https://img.shields.io/packagist/php-v/cerbero/console-tasker?color=%234F5B93&logo=php&style=flat-square
-[ico-laravel]: https://img.shields.io/static/v1?label=laravel&message=%E2%89%A55.5&color=ff2d20&logo=laravel&style=flat-square
+[ico-laravel]: https://img.shields.io/static/v1?label=laravel&message=%E2%89%A58.0&color=ff2d20&logo=laravel&style=flat-square
 [ico-octane]: https://img.shields.io/static/v1?label=octane&message=compatible&color=ff2d20&logo=laravel&style=flat-square
 [ico-version]: https://img.shields.io/packagist/v/cerbero/console-tasker.svg?label=version&style=flat-square
 [ico-actions]: https://img.shields.io/github/workflow/status/cerbero90/console-tasker/build?style=flat-square&logo=github
