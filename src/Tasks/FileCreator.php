@@ -16,14 +16,14 @@ abstract class FileCreator extends FilesEditor
      *
      * @var File
      */
-    protected $file;
+    protected File $file;
 
     /**
      * Whether this task should be skipped if the file to create already exists.
      *
      * @var bool
      */
-    protected $shouldBeSkippedIfFileExists = true;
+    protected bool $shouldBeSkippedIfFileExists = true;
 
     /**
      * Retrieve the path of the stub

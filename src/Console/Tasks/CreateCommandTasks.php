@@ -22,14 +22,14 @@ class CreateCommandTasks extends FileCreator
      *
      * @var ParsedTask
      */
-    protected $parsedTask;
+    protected ParsedTask $parsedTask;
 
     /**
      * The stubs map.
      *
      * @var array
      */
-    protected $stubsMap = [
+    protected array $stubsMap = [
         Tasks\Task::class => __DIR__ . '/../../../stubs/task.stub',
         Tasks\FileCreator::class => __DIR__ . '/../../../stubs/creator.stub',
         Tasks\FilesEditor::class => __DIR__ . '/../../../stubs/updater.stub',

@@ -20,7 +20,7 @@ class MakeConsoleTaskerCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'make:console-tasker
+    protected string $signature = 'make:console-tasker
                             {name : The name of the command}
                             {--c|command=command:name : The terminal command that should be assigned}
                             {--t|tasks= : Comma-separated list of tasks to generate}';
@@ -30,7 +30,7 @@ class MakeConsoleTaskerCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Create a new console tasker';
+    protected string $description = 'Create a new console tasker';
 
     /**
      * Execute the console command.

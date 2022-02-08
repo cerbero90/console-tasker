@@ -13,12 +13,12 @@ class ParsedTask
      *
      * @var string
      */
-    public $name;
+    public string $name;
 
     /**
      * The parent task class.
      *
      * @var string
      */
-    public $parentClass;
+    public string $parentClass;
 }

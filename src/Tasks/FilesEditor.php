@@ -15,7 +15,7 @@ abstract class FilesEditor extends Task
      *
      * @var File[]
      */
-    protected $files = [];
+    protected array $files = [];
 
     /**
      * Retrieve the files being manipulated

@@ -14,14 +14,14 @@ class {{ class }} extends Command
      *
      * @var string
      */
-    protected $signature = '{{ command }}';
+    protected string $signature = '{{ command }}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected string $description = 'Command description';
 
     /**
      * Execute the console command.

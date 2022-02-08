@@ -21,21 +21,21 @@ class File
      *
      * @var bool
      */
-    protected $wasCreated;
+    protected bool $wasCreated;
 
     /**
      * The original content.
      *
      * @var string|null
      */
-    protected $originalContent;
+    protected ?string $originalContent;
 
     /**
      * The reason why the file needs to be updated manually.
      *
      * @var string|null
      */
-    protected $manualUpdateReason;
+    protected ?string $manualUpdateReason;
 
     /**
      * Instantiate the class.
@@ -101,16 +101,6 @@ class File
     }
 
     /**
-     * Retrieve the reason why the file needs to be updated manually
-     *
-     * @return string|null
-     */
-    public function getManualUpdateReason(): ?string
-    {
-        return $this->manualUpdateReason;
-    }
-
-    /**
      * Set the reason why the file needs to be updated manually
      *
      * @param string $reason
@@ -121,6 +111,16 @@ class File
         $this->manualUpdateReason = $reason;
 
         return $this;
+    }
+
+    /**
+     * Retrieve the reason why the file needs to be updated manually
+     *
+     * @return string|null
+     */
+    public function getManualUpdateReason(): ?string
+    {
+        return $this->manualUpdateReason;
     }
 
     /**

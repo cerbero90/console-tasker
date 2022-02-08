@@ -19,7 +19,7 @@ class TasksParser
      *
      * @var array
      */
-    protected $parentClassMap = [
+    protected array $parentClassMap = [
         'c' => Tasks\FileCreator::class,
         'u' => Tasks\FilesEditor::class,
     ];
