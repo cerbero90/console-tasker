@@ -2,7 +2,7 @@
 
 namespace Cerbero\ConsoleTasker\Tasks;
 
-use Cerbero\ConsoleTasker\File;
+use Cerbero\ConsoleTasker\Concerns\AccessesFiles;
 
 /**
  * The abstract files manipulator task.
@@ -10,33 +10,7 @@ use Cerbero\ConsoleTasker\File;
  */
 abstract class FilesEditor extends Task
 {
-    /**
-     * The files being manipulated.
-     *
-     * @var File[]
-     */
-    protected array $files = [];
-
-    /**
-     * Retrieve the files being manipulated
-     *
-     * @return File[]
-     */
-    public function getFiles(): array
-    {
-        return $this->files;
-    }
-
-    /**
-     * Retrieve an instance of the file with the given path
-     *
-     * @param string $path
-     * @return File
-     */
-    protected function file(string $path): File
-    {
-        return $this->files[] = new File($path);
-    }
+    use AccessesFiles;
 
     /**
      * Rollback this task
