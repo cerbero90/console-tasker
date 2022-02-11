@@ -2,11 +2,11 @@
 
 namespace Cerbero\ConsoleTasker\Providers;
 
+use Cerbero\ConsoleTasker\Concerns\ConfigAware;
 use Cerbero\ConsoleTasker\Console\Commands\MakeConsoleTaskerCommand;
 use Cerbero\ConsoleTasker\Console\Printers\BasicPrinter;
 use Cerbero\ConsoleTasker\Console\Printers\Printer;
 use Illuminate\Console\OutputStyle;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -17,6 +17,8 @@ use Symfony\Component\Console\Output\ConsoleOutput;
  */
 class ConsoleTaskerServiceProvider extends ServiceProvider
 {
+    use ConfigAware;
+
     /**
      * The configuration file path.
      *
@@ -57,6 +59,6 @@ class ConsoleTaskerServiceProvider extends ServiceProvider
             return new BasicPrinter(new OutputStyle(new ArgvInput(), new ConsoleOutput()));
         });
 
-        $this->app->bind(Printer::class, Config::get('console_tasker.printer'));
+        $this->app->bind(Printer::class, $this->config('printer'));
     }
 }
