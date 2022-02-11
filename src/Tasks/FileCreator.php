@@ -2,7 +2,6 @@
 
 namespace Cerbero\ConsoleTasker\Tasks;
 
-use Cerbero\ConsoleTasker\File;
 use RuntimeException;
 
 /**
@@ -11,13 +10,6 @@ use RuntimeException;
  */
 abstract class FileCreator extends FilesEditor
 {
-    /**
-     * The file to create.
-     *
-     * @var File
-     */
-    protected File $file;
-
     /**
      * Whether this task should be skipped if the file to create already exists.
      *
@@ -39,10 +31,10 @@ abstract class FileCreator extends FilesEditor
      */
     public function run()
     {
-        $this->file = $this->file($this->getPath());
+        $file = $this->file($this->getPath());
 
         if ($reason = $this->needsManualUpdateTo()) {
-            $this->file->needsManualUpdateTo($reason);
+            $file->needsManualUpdateTo($reason);
         }
 
         if ($this->canCreateFile()) {
