@@ -14,7 +14,7 @@ trait AddsStubs
      * @param string $search
      * @param string $path
      * @param array $replacements
-     * @return self
+     * @return static
      */
     public function addStubBeforeLast(string $search, string $path, array $replacements = []): static
     {
@@ -29,7 +29,7 @@ trait AddsStubs
      * @param string $regex
      * @param string $path
      * @param array $replacements
-     * @return self
+     * @return static
      */
     public function addStubBeforeRegex(string $regex, string $path, array $replacements = []): static
     {
@@ -45,7 +45,7 @@ trait AddsStubs
      * @param string $path
      * @param array $replacements
      * @param callable $callable
-     * @return self
+     * @return static
      */
     public function addStubByRegex(string $regex, string $path, array $replacements, callable $callable): static
     {

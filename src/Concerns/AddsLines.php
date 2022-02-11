@@ -13,7 +13,7 @@ trait AddsLines
      *
      * @param string $search
      * @param mixed $line
-     * @return self
+     * @return static
      */
     public function addLineAfterLast(string $search, mixed $line): static
     {
@@ -29,7 +29,7 @@ trait AddsLines
      * @param string $regex
      * @param mixed $line
      * @param int $offset
-     * @return self
+     * @return static
      */
     public function addLineAfterRegex(string $regex, mixed $line, int $offset = 0): static
     {
@@ -66,7 +66,7 @@ trait AddsLines
      *
      * @param string $search
      * @param mixed $line
-     * @return self
+     * @return static
      */
     public function addLineAfterLastDocblockComment(string $search, mixed $line): static
     {

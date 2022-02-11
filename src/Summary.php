@@ -94,7 +94,7 @@ class Summary
     /**
      * Retrieve the summary instance
      *
-     * @return self
+     * @return static
      */
     public static function instance(): static
     {
@@ -105,7 +105,7 @@ class Summary
      * Add the given executed task
      *
      * @param Task $task
-     * @return self
+     * @return static
      */
     public function addExecutedTask(Task $task): static
     {
@@ -122,7 +122,7 @@ class Summary
      * Add the given succeeded task
      *
      * @param Task $task
-     * @return self
+     * @return static
      */
     protected function addSucceededTask(Task $task): static
     {
@@ -135,7 +135,7 @@ class Summary
      * Add the given skipped task
      *
      * @param Task $task
-     * @return self
+     * @return static
      */
     protected function addSkippedTask(Task $task): static
     {
@@ -148,7 +148,7 @@ class Summary
      * Add the given failed task
      *
      * @param Task $task
-     * @return self
+     * @return static
      */
     protected function addFailedTask(Task $task): static
     {
@@ -206,7 +206,7 @@ class Summary
      *
      * @param Task $task
      * @param Task $failedTask
-     * @return self
+     * @return static
      */
     public function addRolledbackTask(Task $task, Task $failedTask): static
     {
@@ -255,7 +255,7 @@ class Summary
      * Add the given item to the invalid tasks
      *
      * @param Task $task
-     * @return self
+     * @return static
      */
     public function addInvalidTask(Task $task): static
     {

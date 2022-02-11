@@ -104,7 +104,7 @@ class File
      * Set the reason why the file needs to be updated manually
      *
      * @param string $reason
-     * @return self
+     * @return static
      */
     public function needsManualUpdateTo(string $reason): static
     {

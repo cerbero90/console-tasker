@@ -31,7 +31,7 @@ class InvalidTask extends Task
      * Retrieve the invalid task class
      *
      * @param string $class
-     * @return self
+     * @return string
      */
     public function getClass(): string
     {
