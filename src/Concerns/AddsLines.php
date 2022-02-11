@@ -15,12 +15,12 @@ trait AddsLines
      * @param mixed $line
      * @return self
      */
-    public function addLineAfterLast(string $search, $line): static
+    public function addLineAfterLast(string $search, mixed $line): static
     {
         $newline = PHP_EOL;
         $regex = "/([ \t]*).*{$search}.*{$newline}(?!.*{$search})/";
 
-        return $this->addLineAfterRegex($regex, $line);
+        return $this->addLineAfterRegex($regex, $line, 2);
     }
 
     /**
@@ -28,13 +28,14 @@ trait AddsLines
      *
      * @param string $regex
      * @param mixed $line
+     * @param int $offset
      * @return self
      */
-    public function addLineAfterRegex(string $regex, $line): static
+    public function addLineAfterRegex(string $regex, mixed $line, int $offset = 0): static
     {
-        return $this->addLineByRegex($regex, $line, function ($line, $matches) {
-            return $matches[0] . $matches[1] . $line . PHP_EOL;
-        });
+        return $this->addLineByRegex($regex, $line, function ($line, $matchedLine, $spaces) {
+            return $matchedLine . $spaces . $line . PHP_EOL;
+        }, $offset);
     }
 
     /**
@@ -43,13 +44,14 @@ trait AddsLines
      * @param string $regex
      * @param mixed $line
      * @param callable $callable
-     * @return self
+     * @param int $offset
+     * @return static
      */
-    public function addLineByRegex(string $regex, $line, callable $callable): static
+    protected function addLineByRegex(string $regex, mixed $line, callable $callable, int $offset = 0): static
     {
-        $callback = function (array $matches) use ($line, $callable) {
-            $value = is_callable($line) ? $line($matches) : $line;
-            return $callable($value, $matches);
+        $callback = function (array $matches) use ($line, $callable, $offset) {
+            $value = is_callable($line) ? $line(...array_slice($matches, $offset)) : $line;
+            return $callable($value, ...$matches);
         };
 
         $content = preg_replace_callback($regex, $callback, file_get_contents($this->getPath()));
@@ -66,11 +68,11 @@ trait AddsLines
      * @param mixed $line
      * @return self
      */
-    public function addLineAfterLastDocblockComment(string $search, $line): static
+    public function addLineAfterLastDocblockComment(string $search, mixed $line): static
     {
         $newline = PHP_EOL;
         $regex = "/([ \t\*]*).*{$search}.*{$newline}(?!.*{$search})/";
 
-        return $this->addLineAfterRegex($regex, $line);
+        return $this->addLineAfterRegex($regex, $line, 2);
     }
 }
