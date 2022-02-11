@@ -25,7 +25,7 @@ trait DataAware
      */
     public function setData(Data $data): static
     {
-        $this->data = new Data($data);
+        $this->data = $data;
 
         return $this;
     }
