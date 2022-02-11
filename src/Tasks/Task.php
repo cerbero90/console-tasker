@@ -326,4 +326,15 @@ abstract class Task
     {
         return true;
     }
+
+    /**
+     * Dynamically retrieve data
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function __get(string $name): mixed
+    {
+        return $this->getData()->get($name);
+    }
 }
