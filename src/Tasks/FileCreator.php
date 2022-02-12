@@ -2,6 +2,8 @@
 
 namespace Cerbero\ConsoleTasker\Tasks;
 
+use Illuminate\Support\Str;
+use ReflectionClass;
 use RuntimeException;
 
 /**
@@ -18,11 +20,11 @@ abstract class FileCreator extends FilesEditor
     protected bool $shouldBeSkippedIfFileExists = true;
 
     /**
-     * Retrieve the path of the stub
+     * The reason why the created file needs to be updated.
      *
-     * @return string
+     * @var string|null
      */
-    abstract protected function getStubPath(): string;
+    protected ?string $manualUpdateReason = null;
 
     /**
      * Run the task
@@ -82,7 +84,7 @@ abstract class FileCreator extends FilesEditor
      */
     public function needsManualUpdateTo(): ?string
     {
-        return null;
+        return $this->manualUpdateReason;
     }
 
     /**
@@ -122,26 +124,27 @@ abstract class FileCreator extends FilesEditor
             mkdir(dirname($path), 0777, true);
         }
 
-        $replacements = array_merge($this->getDefaultReplacements(), $this->getReplacements());
+        [$search, $replace] = $this->parseReplacements();
         $stubContent = file_get_contents($this->getStubPath());
-        $content = str_replace(array_keys($replacements), array_values($replacements), $stubContent);
+        $content = str_replace($search, $replace, $stubContent);
 
         return file_put_contents($path, $content) !== false;
     }
 
     /**
-     * Retrieve the default replacements to apply on the stub
+     * Retrieve the parsed replacements to apply on the stub
      *
      * @return array
      */
-    protected function getDefaultReplacements(): array
+    protected function parseReplacements(): array
     {
-        $replacements = $this->data->toReplacements();
         $qualified = (string) $this->getFullyQualifiedName();
-        $replacements['{{ class }}'] ??= class_basename($qualified);
-        $replacements['{{ namespace }}'] ??= substr($qualified, 0, strrpos($qualified, '\\'));
+        $default = [
+            'class' => class_basename($qualified),
+            'namespace' => substr($qualified, 0, strrpos($qualified, '\\')),
+        ];
 
-        return $replacements;
+        return $this->data->add($default)->merge($this->getReplacements())->parseReplacements();
     }
 
     /**
@@ -152,6 +155,18 @@ abstract class FileCreator extends FilesEditor
     protected function getReplacements(): array
     {
         return [];
+    }
+
+    /**
+     * Retrieve the path of the stub
+     *
+     * @return string
+     */
+    protected function getStubPath(): string
+    {
+        $path = (new ReflectionClass($this))->getFileName();
+
+        return dirname($path) . '/stubs/' . Str::of(static::class)->classBasename()->snake() . '.stub';
     }
 
     /**

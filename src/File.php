@@ -15,6 +15,7 @@ class File
     use Macroable;
     use Concerns\AddsLines;
     use Concerns\AddsStubs;
+    use Concerns\DataAware;
 
     /**
      * Whether the file was created.
@@ -46,6 +47,17 @@ class File
     {
         $this->wasCreated = !file_exists($path);
         $this->originalContent = $this->wasCreated ? null : file_get_contents($path);
+    }
+
+    /**
+     * Statically instantiate the class
+     *
+     * @param string $path
+     * @return static
+     */
+    public static function from(string $path): static
+    {
+        return new static($path);
     }
 
     /**

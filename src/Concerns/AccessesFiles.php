@@ -36,7 +36,7 @@ trait AccessesFiles
      */
     protected function file(string $path): File
     {
-        return $this->files[] = new File($path);
+        return $this->files[] = File::from($path)->setData($this->getData());
     }
 
     /**

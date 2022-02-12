@@ -11,18 +11,43 @@ use Illuminate\Support\Fluent;
 class Data extends Fluent
 {
     /**
-     * Turn the data into replacements for stubs
+     * Add the given data if it's not akready present
+     *
+     * @param array $data
+     * @return static
+     */
+    public function add(array $data): static
+    {
+        return new static($this->attributes + $data);
+    }
+
+    /**
+     * Merge the given data
+     *
+     * @param array $data
+     * @return static
+     */
+    public function merge(array $data): static
+    {
+        $attributes = array_merge($this->attributes, $data);
+
+        return new static($attributes);
+    }
+
+    /**
+     * Retrieve the parsed replacements for stubs
      *
      * @return array
      */
-    public function toReplacements(): array
+    public function parseReplacements(): array
     {
-        $replacements = [];
+        $search = $replace = [];
 
         foreach ($this->attributes as $key => $value) {
-            $replacements["{{ $key }}"] = $value;
+            $search[] = '{{ ' . trim($key, '{ }') . ' }}';
+            $replace[] = $value;
         }
 
-        return $replacements;
+        return [$search, $replace];
     }
 }
