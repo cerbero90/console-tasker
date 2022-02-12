@@ -45,7 +45,6 @@ class ConsoleTasker
                 $this->processTask($this->resolveTask($task));
             }
         } catch (Throwable $e) {
-            dump($e->getMessage());
             $summary->addException($e);
         }
 
