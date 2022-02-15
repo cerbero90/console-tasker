@@ -1,0 +1,22 @@
+<?php
+
+namespace {{ namespace }};
+
+use Cerbero\ConsoleTasker\Tasks\FileCreator;
+
+/**
+ * The task to {{ purpose }}.
+ *
+ */
+class {{ class }} extends FileCreator
+{
+    /**
+     * Retrieve the fully qualified name of the file to create
+     *
+     * @return string|null
+     */
+    protected function getFullyQualifiedName(): ?string
+    {
+        return null;
+    }
+}

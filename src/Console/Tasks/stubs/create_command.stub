@@ -2,8 +2,7 @@
 
 namespace {{ namespace }};
 
-{{ namespaces }}use Cerbero\ConsoleTasker\Concerns\RunsTasks;
-use Illuminate\Console\Command;
+{{ useStatements }}
 
 class {{ class }} extends Command
 {
@@ -24,14 +23,11 @@ class {{ class }} extends Command
     protected $description = 'Command description';
 
     /**
-     * Execute the console command.
+     * The tasks to run.
      *
-     * @return void
+     * @var string[]
      */
-    public function handle()
-    {
-        $this->runTasks([
+    protected array $tasks = [
 {{ tasks }}
-        ]);
-    }
+    ];
 }
