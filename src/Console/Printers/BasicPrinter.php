@@ -97,8 +97,8 @@ class BasicPrinter extends AbstractPrinter
                 $array = $file->wasCreated() ? 'created' : 'updated';
                 $$array[] = $file->getRelativePath();
 
-                if ($file->needsManualUpdate()) {
-                    $toUpdate[] = ucfirst($file->getManualUpdateReason()) . ' in ' . $file->getRelativePath();
+                if ($manualUpdate = $file->getManualUpdateReason()) {
+                    $toUpdate[] = $manualUpdate . ' in ' . $file->getRelativePath();
                 }
             }
         }

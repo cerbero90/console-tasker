@@ -32,11 +32,11 @@ class File
     protected ?string $originalContent;
 
     /**
-     * The reason why the file needs to be updated manually.
+     * The reasons why the file needs to be updated manually.
      *
-     * @var string|null
+     * @var string[]
      */
-    protected ?string $manualUpdateReason;
+    protected array $manualUpdateReasons = [];
 
     /**
      * Instantiate the class.
@@ -120,7 +120,7 @@ class File
      */
     public function needsManualUpdateTo(string $reason): static
     {
-        $this->manualUpdateReason = $reason;
+        $this->manualUpdateReasons[] = $reason;
 
         return $this;
     }
@@ -128,20 +128,17 @@ class File
     /**
      * Retrieve the reason why the file needs to be updated manually
      *
-     * @return string|null
+     * @return string
      */
-    public function getManualUpdateReason(): ?string
+    public function getManualUpdateReason(): string
     {
-        return $this->manualUpdateReason;
-    }
+        preg_match_all('/@todo\s+(.+(?: *\w+))/', file_get_contents($this->getPath()), $matches);
 
-    /**
-     * Determine whether the file needs to be updated manually
-     *
-     * @return bool
-     */
-    public function needsManualUpdate(): bool
-    {
-        return isset($this->manualUpdateReason);
+        $reasons = [
+            ...$this->manualUpdateReasons,
+            ...$matches[1],
+        ];
+
+        return collect($reasons)->join(', ', ' and ');
     }
 }
