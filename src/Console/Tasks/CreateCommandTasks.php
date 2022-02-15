@@ -24,6 +24,20 @@ class CreateCommandTasks extends FileCreator
     protected ParsedTask $parsedTask;
 
     /**
+     * The reason why this task should not run.
+     *
+     * @var string|null
+     */
+    protected ?string $skippingReason = 'tasks to generate were not specified';
+
+    /**
+     * The reason why the created file needs to be updated.
+     *
+     * @var string|null
+     */
+    protected ?string $manualUpdateReason = 'implement task logic';
+
+    /**
      * Instantiate the class.
      *
      * @param TasksParser $parser
@@ -59,11 +73,12 @@ class CreateCommandTasks extends FileCreator
      */
     protected function createStub(): bool
     {
-        if ($this->parsedTask->parent != FileCreator::class && !$this->parsedTask->needsStub) {
+        if (!$this->parsedTask->parent::needsStub()) {
             return true;
         }
 
         $path = dirname($this->getPath()) . '/stubs/' . Str::snake($this->parsedTask->name) . '.stub';
+
         $this->file($path)->needsManualUpdateTo('add stub content');
 
         if (!is_dir(dirname($path))) {
@@ -84,16 +99,6 @@ class CreateCommandTasks extends FileCreator
     }
 
     /**
-     * Retrieve the reason why this task should not run
-     *
-     * @return string|null
-     */
-    public function getSkippingReason(): ?string
-    {
-        return 'tasks to generate were not specified';
-    }
-
-    /**
      * Retrieve the path of the stub
      *
      * @return string
@@ -101,9 +106,14 @@ class CreateCommandTasks extends FileCreator
     protected function getStubPath(): string
     {
         $stub = Str::of($this->parsedTask->parent)->classBasename()->snake() . '.stub';
-        $customPath = $this->app->basePath("stubs/console-tasker/{$stub}");
+        $customPath = $this->app->basePath('stubs/console-tasker/');
 
-        return file_exists($customPath) ? $customPath : __DIR__ . "/stubs/{$stub}";
+        return match (true) {
+            file_exists($path = $customPath . $stub) => $path,
+            file_exists($path = __DIR__ . "/stubs/{$stub}") => $path,
+            file_exists($path = $customPath . 'task.stub') => $path,
+            default => __DIR__ . "/stubs/task.stub",
+        };
     }
 
     /**
@@ -116,16 +126,6 @@ class CreateCommandTasks extends FileCreator
         return (string) Str::of($this->config('tasks_directory'))
             ->replace([$this->app->basePath('app/'), '/'], [$this->app->getNamespace(), '\\'])
             ->append('\\', $this->data->name, '\\', $this->parsedTask->name);
-    }
-
-    /**
-     * Retrieve the reason why the file needs to be updated manually
-     *
-     * @return string|null
-     */
-    public function needsManualUpdateTo(): ?string
-    {
-        return 'implement task logic';
     }
 
     /**

@@ -39,39 +39,23 @@ class TasksParser
             $segments = explode(':', $rawTask, 2);
             $parsedTasks[] = $parsedTask = new ParsedTask();
             $parsedTask->name = $segments[0];
-            $this->handleModifiers($parsedTask, $segments[1] ?? '');
+            $parsedTask->parent = $this->guessParent($parsedTask, $segments[1] ?? '');
         }
 
         return $parsedTasks;
     }
 
     /**
-     * Handle the given modifiers
-     *
-     * @param ParsedTask $parsedTask
-     * @param string $modifiers
-     * @return void
-     */
-    protected function handleModifiers(ParsedTask $parsedTask, string $modifiers): void
-    {
-        $modifiers = str_replace('s', '', $modifiers, $count);
-
-        $parsedTask->needsStub = $count > 0;
-
-        $parsedTask->parent = $this->guessParent($parsedTask, $modifiers);
-    }
-
-    /**
      * Guess the parent class of the given task
      *
      * @param ParsedTask $parsedTask
-     * @param string $modifiers
+     * @param string $modifier
      * @return string
      */
-    protected function guessParent(ParsedTask $parsedTask, string $modifiers): string
+    protected function guessParent(ParsedTask $parsedTask, string $modifier): string
     {
-        if ($modifiers) {
-            return $this->parentMap[$modifiers] ?? Tasks\Task::class;
+        if (isset($this->parentMap[$modifier])) {
+            return $this->parentMap[$modifier];
         }
 
         foreach ($this->config('verbs') as $class => $verbs) {

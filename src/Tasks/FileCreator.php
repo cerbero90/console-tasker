@@ -13,6 +13,13 @@ use RuntimeException;
 abstract class FileCreator extends FilesEditor
 {
     /**
+     * Whether the task needs a stub to work.
+     *
+     * @var bool
+     */
+    protected static bool $needsStub = true;
+
+    /**
      * Whether this task should be skipped if the file to create already exists.
      *
      * @var bool

@@ -18,6 +18,13 @@ abstract class Task
     use IOAware;
 
     /**
+     * Whether the task needs a stub to work.
+     *
+     * @var bool
+     */
+    protected static bool $needsStub = false;
+
+    /**
      * The task purpose.
      *
      * @var string
@@ -102,6 +109,39 @@ abstract class Task
     abstract protected function run();
 
     /**
+     * Determine whether the task needs a stub to work
+     *
+     * @return bool
+     */
+    public static function needsStub(): bool
+    {
+        return static::$needsStub;
+    }
+
+    /**
+     * Set the application
+     *
+     * @param Application $app
+     * @return static
+     */
+    public function setApp(Application $app): static
+    {
+        $this->app = $app;
+
+        return $this;
+    }
+
+    /**
+     * Retrieve this task purpose
+     *
+     * @return string
+     */
+    public function getPurpose(): string
+    {
+        return $this->purpose ??= (string) Str::of(static::class)->classBasename()->snake(' ');
+    }
+
+    /**
      * Perform the task
      *
      * @return bool
@@ -127,29 +167,6 @@ abstract class Task
         }
 
         return $this->succeeded();
-    }
-
-    /**
-     * Set the application
-     *
-     * @param Application $app
-     * @return static
-     */
-    public function setApp(Application $app): static
-    {
-        $this->app = $app;
-
-        return $this;
-    }
-
-    /**
-     * Retrieve this task purpose
-     *
-     * @return string
-     */
-    public function getPurpose(): string
-    {
-        return $this->purpose ??= (string) Str::of(static::class)->classBasename()->snake(' ');
     }
 
     /**
