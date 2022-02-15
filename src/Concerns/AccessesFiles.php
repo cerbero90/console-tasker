@@ -66,12 +66,12 @@ trait AccessesFiles
     }
 
     /**
-     * Retrieve an instance of file by the given config file
+     * Retrieve an instance of file by the given configuration file
      *
      * @param string $config
      * @return File
      */
-    protected function config(string $config): File
+    protected function configuration(string $config): File
     {
         $path = $this->app->configPath($config);
 
