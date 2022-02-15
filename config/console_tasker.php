@@ -34,12 +34,27 @@ return [
     |--------------------------------------------------------------------------
     |
     | Common tasks implementations are provided by this package, such as files
-    | creators and updaters. Depending on verbs used to name tasks, the apt
+    | creators and editors. Based on the verb chosen to name tasks, the apt
     | implementation might be implicitly guessed during tasks generation.
     |
     */
     'verbs' => [
         Tasks\FileCreator::class => ['create', 'generate'],
         Tasks\FilesEditor::class => ['add', 'update'],
-    ]
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Task modifiers
+    |--------------------------------------------------------------------------
+    |
+    | Modifiers can be used as a shorthand to generate specific tasks from the
+    | Artisan command line. Below you can specify which kind of task should
+    | be generated when a modifier is indicated along with the task name.
+    |
+    */
+    'modifiers' => [
+        'c' => Tasks\FileCreator::class,
+        'e' => Tasks\FilesEditor::class,
+    ],
 ];

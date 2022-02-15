@@ -15,16 +15,6 @@ class TasksParser
     use ConfigAware;
 
     /**
-     * The parent class map.
-     *
-     * @var array
-     */
-    protected array $parentMap = [
-        'c' => Tasks\FileCreator::class,
-        'e' => Tasks\FilesEditor::class,
-    ];
-
-    /**
      * Parse the tasks contained in the given input
      *
      * @param string $input
@@ -54,8 +44,10 @@ class TasksParser
      */
     protected function guessParent(ParsedTask $parsedTask, string $modifier): string
     {
-        if (isset($this->parentMap[$modifier])) {
-            return $this->parentMap[$modifier];
+        $modifiers = $this->config('modifiers');
+
+        if (isset($modifiers[$modifier])) {
+            return $modifiers[$modifier];
         }
 
         foreach ($this->config('verbs') as $class => $verbs) {
