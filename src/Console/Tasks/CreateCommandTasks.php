@@ -5,7 +5,6 @@ namespace Cerbero\ConsoleTasker\Console\Tasks;
 use Cerbero\ConsoleTasker\Concerns\ConfigAware;
 use Cerbero\ConsoleTasker\Console\ParsedTask;
 use Cerbero\ConsoleTasker\Console\TasksParser;
-use Cerbero\ConsoleTasker\Tasks;
 use Cerbero\ConsoleTasker\Tasks\FileCreator;
 use Illuminate\Support\Str;
 
@@ -23,17 +22,6 @@ class CreateCommandTasks extends FileCreator
      * @var ParsedTask
      */
     protected ParsedTask $parsedTask;
-
-    /**
-     * The stubs map.
-     *
-     * @var array
-     */
-    protected array $stubsMap = [
-        Tasks\Task::class => __DIR__ . '/stubs/task.stub',
-        Tasks\FileCreator::class => __DIR__ . '/stubs/creator.stub',
-        Tasks\FilesEditor::class => __DIR__ . '/stubs/editor.stub',
-    ];
 
     /**
      * Instantiate the class.
@@ -112,7 +100,10 @@ class CreateCommandTasks extends FileCreator
      */
     protected function getStubPath(): string
     {
-        return $this->stubsMap[$this->parsedTask->parent];
+        $stub = Str::of($this->parsedTask->parent)->classBasename()->snake() . '.stub';
+        $customPath = $this->app->basePath("stubs/console-tasker/{$stub}");
+
+        return file_exists($customPath) ? $customPath : __DIR__ . "/stubs/{$stub}";
     }
 
     /**

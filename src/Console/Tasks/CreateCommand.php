@@ -119,4 +119,16 @@ class CreateCommand extends FileCreator
             ->map(fn (string $class) => "use {$class};")
             ->implode(PHP_EOL);
     }
+
+    /**
+     * Retrieve the path of the stub
+     *
+     * @return string
+     */
+    protected function getStubPath(): string
+    {
+        $customPath = $this->app->basePath('stubs/console-tasker/create_command.stub');
+
+        return file_exists($customPath) ? $customPath : __DIR__ . '/stubs/create_command.stub';
+    }
 }

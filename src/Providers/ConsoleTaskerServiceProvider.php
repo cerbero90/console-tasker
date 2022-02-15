@@ -42,7 +42,7 @@ class ConsoleTaskerServiceProvider extends ServiceProvider
         ], 'console-tasker');
 
         $this->publishes([
-            __DIR__ . '/../../stubs' => $this->app->basePath('stubs/console-tasker'),
+            __DIR__ . '/../Console/Tasks/stubs' => $this->app->basePath('stubs/console-tasker'),
         ], 'console-tasker-stubs');
     }
 
