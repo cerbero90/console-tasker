@@ -16,9 +16,16 @@ class ParsedTask
     public string $name;
 
     /**
-     * The parent task class.
+     * The task parent class.
      *
      * @var string
      */
-    public string $parentClass;
+    public string $parent;
+
+    /**
+     * Whether the task needs a stub.
+     *
+     * @var bool
+     */
+    public bool $needsStub;
 }

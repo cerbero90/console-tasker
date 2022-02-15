@@ -19,9 +19,9 @@ class TasksParser
      *
      * @var array
      */
-    protected array $parentClassMap = [
+    protected array $parentMap = [
         'c' => Tasks\FileCreator::class,
-        'u' => Tasks\FilesEditor::class,
+        'e' => Tasks\FilesEditor::class,
     ];
 
     /**
@@ -36,30 +36,46 @@ class TasksParser
         $rawTasks = explode(',', $input);
 
         foreach ($rawTasks as $rawTask) {
+            $segments = explode(':', $rawTask, 2);
             $parsedTasks[] = $parsedTask = new ParsedTask();
-            $parsedTask->name = explode(':', $rawTask)[0];
-            $parsedTask->parentClass = $this->guessParentClass($rawTask);
+            $parsedTask->name = $segments[0];
+            $this->handleModifiers($parsedTask, $segments[1] ?? '');
         }
 
         return $parsedTasks;
     }
 
     /**
-     * Retrieve the guessed parent task class
+     * Handle the given modifiers
      *
-     * @param string $rawTask
+     * @param ParsedTask $parsedTask
+     * @param string $modifiers
+     * @return void
+     */
+    protected function handleModifiers(ParsedTask $parsedTask, string $modifiers): void
+    {
+        $modifiers = str_replace('s', '', $modifiers, $count);
+
+        $parsedTask->needsStub = $count > 0;
+
+        $parsedTask->parent = $this->guessParent($parsedTask, $modifiers);
+    }
+
+    /**
+     * Guess the parent class of the given task
+     *
+     * @param ParsedTask $parsedTask
+     * @param string $modifiers
      * @return string
      */
-    protected function guessParentClass(string $rawTask): string
+    protected function guessParent(ParsedTask $parsedTask, string $modifiers): string
     {
-        $segments = explode(':', $rawTask);
-
-        if ($key = $segments[1] ?? null) {
-            return $this->parentClassMap[$key] ?? Tasks\Task::class;
+        if ($modifiers) {
+            return $this->parentMap[$modifiers] ?? Tasks\Task::class;
         }
 
         foreach ($this->config('verbs') as $class => $verbs) {
-            if (Str::startsWith(strtolower($segments[0]), $verbs)) {
+            if (Str::startsWith(strtolower($parsedTask->name), $verbs)) {
                 return $class;
             }
         }
