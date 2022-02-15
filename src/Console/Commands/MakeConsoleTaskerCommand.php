@@ -2,9 +2,9 @@
 
 namespace Cerbero\ConsoleTasker\Console\Commands;
 
+use Cerbero\ConsoleTasker\Concerns\RunsTasks;
 use Cerbero\ConsoleTasker\Console\Tasks\CreateCommand;
 use Cerbero\ConsoleTasker\Console\Tasks\CreateCommandTasks;
-use Cerbero\ConsoleTasker\Concerns\RunsTasks;
 use Illuminate\Console\Command;
 
 /**
@@ -33,12 +33,23 @@ class MakeConsoleTaskerCommand extends Command
     protected $description = 'Create a new console tasker';
 
     /**
-     * Execute the console command.
+     * The tasks to run.
      *
-     * @return int
+     * @var string[]
      */
-    public function handle()
+    protected array $tasks = [CreateCommand::class, CreateCommandTasks::class];
+
+    /**
+     * Retrieve the data for tasks and stubs
+     *
+     * @return array
+     */
+    protected function data(): array
     {
-        return $this->runTasks(CreateCommand::class, CreateCommandTasks::class);
+        return [
+            'name' => $this->argument('name'),
+            'command' => $this->option('command'),
+            'tasks' => $this->option('tasks'),
+        ];
     }
 }

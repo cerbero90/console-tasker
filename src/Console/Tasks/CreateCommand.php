@@ -2,10 +2,12 @@
 
 namespace Cerbero\ConsoleTasker\Console\Tasks;
 
+use Cerbero\ConsoleTasker\Concerns\ConfigAware;
+use Cerbero\ConsoleTasker\Concerns\RunsTasks;
 use Cerbero\ConsoleTasker\Console\ParsedTask;
 use Cerbero\ConsoleTasker\Console\TasksParser;
 use Cerbero\ConsoleTasker\Tasks\FileCreator;
-use Cerbero\ConsoleTasker\Concerns\ConfigAware;
+use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
 /**
@@ -26,23 +28,13 @@ class CreateCommand extends FileCreator
     }
 
     /**
-     * Retrieve the path of the stub
-     *
-     * @return string
-     */
-    protected function getStubPath(): string
-    {
-        return __DIR__ . '/../../../stubs/command.stub';
-    }
-
-    /**
      * Retrieve the fully qualified name of the file to create
      *
      * @return string|null
      */
     protected function getFullyQualifiedName(): ?string
     {
-        $name = str_replace('/', '\\', $this->argument('name'));
+        $name = str_replace('/', '\\', $this->data->name);
         $namespace = $this->app->getNamespace();
 
         if (Str::startsWith($name, $namespace)) {
@@ -50,16 +42,6 @@ class CreateCommand extends FileCreator
         }
 
         return "{$namespace}Console\Commands\\{$name}";
-    }
-
-    /**
-     * Determine whether this task should run
-     *
-     * @return bool
-     */
-    public function shouldRun(): bool
-    {
-        return !file_exists($this->getPath());
     }
 
     /**
@@ -79,11 +61,11 @@ class CreateCommand extends FileCreator
      */
     public function needsManualUpdateTo(): ?string
     {
-        if ($this->option('command') == 'command:name') {
-            return 'write command name and description';
+        if ($this->command == 'command:name') {
+            return 'define command signature and description';
         }
 
-        return 'write command description';
+        return 'define command description';
     }
 
     /**
@@ -93,12 +75,11 @@ class CreateCommand extends FileCreator
      */
     protected function getReplacements(): array
     {
-        $parsedTasks = $this->option('tasks') ? $this->parser->parse($this->option('tasks')) : [];
+        $parsedTasks = $this->tasks ? $this->parser->parse($this->tasks) : [];
 
         return [
-            '{{ command }}' => $this->option('command'),
-            '{{ tasks }}' => $this->getPaddedTasks($parsedTasks),
-            '{{ namespaces }}' => $this->getNamespaces($parsedTasks),
+            'tasks' => $this->getPaddedTasks($parsedTasks),
+            'useStatements' => $this->getUseStatements($parsedTasks),
         ];
     }
 
@@ -111,36 +92,31 @@ class CreateCommand extends FileCreator
     protected function getPaddedTasks(array $parsedTasks): string
     {
         if (empty($parsedTasks)) {
-            return str_repeat(' ', 12) . '//';
+            return str_repeat(' ', 8) . '// @todo list tasks to run';
         }
 
-        $paddedTasks = array_map(function (ParsedTask $task) {
-            return str_repeat(' ', 12) . $task->name . '::class,';
-        }, $parsedTasks);
-
-        return implode(PHP_EOL, $paddedTasks);
+        return collect($parsedTasks)
+            ->map(fn (ParsedTask $task) => str_repeat(' ', 8) . $task->name . '::class,')
+            ->implode(PHP_EOL);
     }
 
     /**
-     * Retrieve the task namespaces
+     * Retrieve the use statements
      *
      * @param array $parsedTasks
      * @return string|null
      */
-    protected function getNamespaces(array $parsedTasks): ?string
+    protected function getUseStatements(array $parsedTasks): ?string
     {
-        if (empty($parsedTasks)) {
-            return null;
-        }
+        $namespace = Str::of($this->config('tasks_directory'))
+            ->replace([$this->app->basePath('app/'), '/'], [$this->app->getNamespace(), '\\'])
+            ->append('\\', $this->data->name, '\\');
 
-        $namespace = vsprintf('%s%s\%s', [
-            $this->app->getNamespace(),
-            str_replace('/', '\\', $this->config('tasks_directory')),
-            $this->argument('name'),
-        ]);
-
-        return array_reduce($parsedTasks, function (string $carry, ParsedTask $task) use ($namespace) {
-            return $carry .= "use {$namespace}\\{$task->name};" . PHP_EOL;
-        }, '');
+        return collect($parsedTasks)
+            ->map(fn (ParsedTask $task) => $namespace . $task->name)
+            ->push(Command::class, RunsTasks::class)
+            ->sort()
+            ->map(fn (string $class) => "use {$class};")
+            ->implode(PHP_EOL);
     }
 }

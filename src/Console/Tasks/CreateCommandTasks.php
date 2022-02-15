@@ -2,11 +2,11 @@
 
 namespace Cerbero\ConsoleTasker\Console\Tasks;
 
+use Cerbero\ConsoleTasker\Concerns\ConfigAware;
 use Cerbero\ConsoleTasker\Console\ParsedTask;
 use Cerbero\ConsoleTasker\Console\TasksParser;
 use Cerbero\ConsoleTasker\Tasks;
 use Cerbero\ConsoleTasker\Tasks\FileCreator;
-use Cerbero\ConsoleTasker\Concerns\ConfigAware;
 use Illuminate\Support\Str;
 
 /**
@@ -30,9 +30,9 @@ class CreateCommandTasks extends FileCreator
      * @var array
      */
     protected array $stubsMap = [
-        Tasks\Task::class => __DIR__ . '/../../../stubs/task.stub',
-        Tasks\FileCreator::class => __DIR__ . '/../../../stubs/creator.stub',
-        Tasks\FilesEditor::class => __DIR__ . '/../../../stubs/updater.stub',
+        Tasks\Task::class => __DIR__ . '/stubs/task.stub',
+        Tasks\FileCreator::class => __DIR__ . '/stubs/creator.stub',
+        Tasks\FilesEditor::class => __DIR__ . '/stubs/editor.stub',
     ];
 
     /**
@@ -51,7 +51,7 @@ class CreateCommandTasks extends FileCreator
      */
     public function run()
     {
-        $parsedTasks = $this->parser->parse($this->option('tasks'));
+        $parsedTasks = $this->parser->parse($this->tasks);
 
         foreach ($parsedTasks as $parsedTask) {
             $this->parsedTask = $parsedTask;
@@ -71,7 +71,7 @@ class CreateCommandTasks extends FileCreator
      */
     protected function createStub(): bool
     {
-        if ($this->parsedTask->parentClass != FileCreator::class) {
+        if ($this->parsedTask->parent != FileCreator::class && !$this->parsedTask->needsStub) {
             return true;
         }
 
@@ -92,7 +92,7 @@ class CreateCommandTasks extends FileCreator
      */
     public function shouldRun(): bool
     {
-        return $this->option('tasks') !== null;
+        return $this->tasks !== null;
     }
 
     /**
@@ -112,7 +112,7 @@ class CreateCommandTasks extends FileCreator
      */
     protected function getStubPath(): string
     {
-        return $this->stubsMap[$this->parsedTask->parentClass];
+        return $this->stubsMap[$this->parsedTask->parent];
     }
 
     /**
@@ -122,12 +122,9 @@ class CreateCommandTasks extends FileCreator
      */
     protected function getFullyQualifiedName(): ?string
     {
-        return vsprintf('%s%s\%s\%s', [
-            $this->app->getNamespace(),
-            str_replace('/', '\\', $this->config('tasks_directory')),
-            $this->argument('name'),
-            $this->parsedTask->name,
-        ]);
+        return (string) Str::of($this->config('tasks_directory'))
+            ->replace([$this->app->basePath('app/'), '/'], [$this->app->getNamespace(), '\\'])
+            ->append('\\', $this->data->name, '\\', $this->parsedTask->name);
     }
 
     /**
@@ -148,8 +145,7 @@ class CreateCommandTasks extends FileCreator
     protected function getReplacements(): array
     {
         return [
-            '{{ purpose }}' => Str::snake($this->parsedTask->name, ' '),
-            '{{ stub }}' => Str::snake($this->parsedTask->name),
+            'purpose' => Str::snake($this->parsedTask->name, ' '),
         ];
     }
 }
