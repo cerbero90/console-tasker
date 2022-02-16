@@ -318,7 +318,8 @@ class Summary
     {
         return empty($this->failedTasks)
             && empty($this->rolledbackTasks)
-            && count($this->executedTasks) == count($this->succeededTasks) + count($this->skippedTasks);
+            && count($this->executedTasks) == count($this->succeededTasks) + count($this->skippedTasks)
+            && empty($this->exceptions);
     }
 
     /**
