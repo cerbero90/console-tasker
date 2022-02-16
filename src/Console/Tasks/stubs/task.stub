@@ -17,6 +17,6 @@ class {{ class }} extends Task
      */
     public function run()
     {
-        // @todo Implement logic
+        //
     }
 }
