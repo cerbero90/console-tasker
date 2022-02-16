@@ -68,7 +68,7 @@ trait AddsLines
      * @param mixed $line
      * @return static
      */
-    public function addLineAfterLastDocblockComment(string $search, mixed $line): static
+    public function addLineAfterLastDocblock(string $search, mixed $line): static
     {
         $newline = PHP_EOL;
         $regex = "/([ \t\*]*).*{$search}.*{$newline}(?!.*{$search})/";
