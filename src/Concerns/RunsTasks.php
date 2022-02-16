@@ -31,7 +31,7 @@ trait RunsTasks
     {
         return $this->laravel->make(ConsoleTasker::class)
             ->setIO($this->input, $this->output)
-            ->setData(new Data($this->data()))
+            ->setData($this->mergeData())
             ->runTasks(...$tasks);
     }
 
@@ -43,6 +43,26 @@ trait RunsTasks
     protected function tasks(): array
     {
         return $this->tasks ?? [];
+    }
+
+    /**
+     * Retrieve the merged data
+     *
+     * @return Data
+     */
+    protected function mergeData(): Data
+    {
+        $data = new Data();
+
+        foreach ($this->getNativeDefinition()->getArguments() as $key => $input) {
+            $data[$key] = $this->argument($key);
+        }
+
+        foreach ($this->getNativeDefinition()->getOptions() as $key => $input) {
+            $data[$key] = $this->option($key);
+        }
+
+        return $data->merge($this->data());
     }
 
     /**

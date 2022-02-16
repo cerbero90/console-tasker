@@ -38,18 +38,4 @@ class MakeConsoleTaskerCommand extends Command
      * @var string[]
      */
     protected array $tasks = [CreateCommand::class, CreateCommandTasks::class];
-
-    /**
-     * Retrieve the data for tasks and stubs
-     *
-     * @return array
-     */
-    protected function data(): array
-    {
-        return [
-            'name' => $this->argument('name'),
-            'command' => $this->option('command'),
-            'tasks' => $this->option('tasks'),
-        ];
-    }
 }
