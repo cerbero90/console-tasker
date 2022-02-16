@@ -110,6 +110,14 @@ abstract class AbstractPrinter implements Printer
     abstract protected function printFailedRollbacks(array $rollbacks): void;
 
     /**
+     * Print out the exceptions
+     *
+     * @param \Throwable[] $exceptions
+     * @return void
+     */
+    abstract protected function printExceptions(array $exceptions): void;
+
+    /**
      * Print the given task after it ran
      *
      * @param Task $task
@@ -153,6 +161,10 @@ abstract class AbstractPrinter implements Printer
 
         if ($failedRollbacks = $summary->getFailedRollbacks()) {
             $this->printFailedRollbacks($failedRollbacks);
+        }
+
+        if ($exceptions = $summary->getExceptions()) {
+            $this->printExceptions($exceptions);
         }
     }
 }

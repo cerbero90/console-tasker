@@ -162,4 +162,15 @@ class BasicPrinter extends AbstractPrinter
 
         $this->listItems('Failed rollbacks', $rollbackResults);
     }
+
+    /**
+     * Print out the exceptions
+     *
+     * @param \Throwable[] $exceptions
+     * @return void
+     */
+    protected function printExceptions(array $exceptions): void
+    {
+        $this->output->error($exceptions[0]->getMessage());
+    }
 }
