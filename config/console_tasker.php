@@ -1,6 +1,6 @@
 <?php
 
-use Cerbero\ConsoleTasker\Console\Printers\BasicPrinter;
+use Cerbero\ConsoleTasker\Console\Printers\TermwindPrinter;
 use Cerbero\ConsoleTasker\Tasks;
 
 return [
@@ -14,7 +14,7 @@ return [
     | box a default printer is available, but you can set your own below.
     |
     */
-    'printer' => BasicPrinter::class,
+    'printer' => TermwindPrinter::class,
 
     /*
     |--------------------------------------------------------------------------

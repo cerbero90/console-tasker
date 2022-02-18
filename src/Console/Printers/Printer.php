@@ -28,6 +28,14 @@ interface Printer
     public function printRunTask(Task $task): void;
 
     /**
+     * Print the given task after it rolled back
+     *
+     * @param Task $task
+     * @return void
+     */
+    public function printRolledbackTask(Task $task): void;
+
+    /**
      * Print the tasks summary
      *
      * @param Summary $summary

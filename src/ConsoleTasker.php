@@ -142,6 +142,8 @@ class ConsoleTasker
 
             Summary::instance()->addRolledbackTask($task, $failedTask);
 
+            $this->printer->printRolledbackTask($task);
+
             if ($task->rolledback()) {
                 $this->rollbackTasksDueTo($task, $tasks);
             }

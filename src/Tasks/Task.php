@@ -17,6 +17,13 @@ abstract class Task
     use DataAware;
     use IOAware;
 
+    public const STATUS_PENDING = 0;
+    public const STATUS_SUCCEEDED = 1;
+    public const STATUS_SKIPPED = 2;
+    public const STATUS_FAILED = 3;
+    public const STATUS_ROLLEDBACK = 4;
+    public const STATUS_FAILED_ROLLBACK = 5;
+
     /**
      * Whether the task needs a stub to work.
      *
@@ -342,6 +349,23 @@ abstract class Task
     public function stopsOnFailure(): bool
     {
         return true;
+    }
+
+    /**
+     * Retrieve this task status
+     *
+     * @return int
+     */
+    public function getStatus(): int
+    {
+        return match (true) {
+            $this->wasSkipped() => static::STATUS_SKIPPED,
+            !$this->ran() => static::STATUS_PENDING,
+            $this->ranRollback() && !$this->rolledback() => static::STATUS_FAILED_ROLLBACK,
+            $this->rolledback() => static::STATUS_ROLLEDBACK,
+            $this->failed() => static::STATUS_FAILED,
+            $this->succeeded() => static::STATUS_SUCCEEDED,
+        };
     }
 
     /**

@@ -20,7 +20,7 @@
         "illuminate/console": ">=8.0",
         "illuminate/contracts": ">=8.0",
         "illuminate/support": ">=8.0",
-        "nunomaduro/termwind": "^1.4"
+        "nunomaduro/termwind": "dev-feat/live"
     },
     "require-dev": {
         "orchestra/testbench": ">=6.0",
