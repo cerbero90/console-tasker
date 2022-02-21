@@ -32,6 +32,13 @@ abstract class Task
     protected static bool $needsStub = false;
 
     /**
+     * The application.
+     *
+     * @var Application
+     */
+    protected Application $app;
+
+    /**
      * The task purpose.
      *
      * @var string
@@ -60,34 +67,6 @@ abstract class Task
     protected bool $wasSkipped = false;
 
     /**
-     * The reason why this task should not run.
-     *
-     * @var string|null
-     */
-    protected ?string $skippingReason = null;
-
-    /**
-     * The error that caused this task to fail.
-     *
-     * @var string|null
-     */
-    protected ?string $error = null;
-
-    /**
-     * The exception that caused this task to fail.
-     *
-     * @var Throwable|null
-     */
-    protected ?Throwable $exception = null;
-
-    /**
-     * The exception that caused this task rollback to fail.
-     *
-     * @var Throwable|null
-     */
-    protected ?Throwable $rollbackException = null;
-
-    /**
      * Whether this task executed the rollback logic.
      *
      * @var bool
@@ -102,11 +81,60 @@ abstract class Task
     protected bool $rolledback = false;
 
     /**
-     * The application.
+     * Whether next tasks should be stopped if this task fails.
      *
-     * @var Application
+     * @var bool
      */
-    protected Application $app;
+    protected bool $stopsOnFailure = true;
+
+    /**
+     * The reason why this task succeeded.
+     *
+     * @var string|null
+     */
+    protected ?string $successReason = null;
+
+    /**
+     * The reason why this task should not be run.
+     *
+     * @var string|null
+     */
+    protected ?string $skippingReason = null;
+
+    /**
+     * The reason why this task failed.
+     *
+     * @var string|null
+     */
+    protected ?string $failureReason = null;
+
+    /**
+     * The reason why the rollback of this task succeeded.
+     *
+     * @var string|null
+     */
+    protected ?string $rollbackSuccessReason = null;
+
+    /**
+     * The reason why the rollback of this task failed.
+     *
+     * @var string|null
+     */
+    protected ?string $rollbackFailureReason = null;
+
+    /**
+     * The exception that caused this task to fail.
+     *
+     * @var Throwable|null
+     */
+    protected ?Throwable $exception = null;
+
+    /**
+     * The exception that caused this task rollback to fail.
+     *
+     * @var Throwable|null
+     */
+    protected ?Throwable $rollbackException = null;
 
     /**
      * Run the task
@@ -170,7 +198,8 @@ abstract class Task
             $this->succeeded = $this->run() !== false;
         } catch (Throwable $e) {
             $this->succeeded = false;
-            $this->setException($e);
+            $this->exception = $e;
+            $this->failureReason ??= $e->getMessage();
         }
 
         return $this->succeeded();
@@ -184,6 +213,16 @@ abstract class Task
     public function ran(): bool
     {
         return $this->ran;
+    }
+
+    /**
+     * Determine whether this task should run
+     *
+     * @return bool
+     */
+    public function shouldRun(): bool
+    {
+        return true;
     }
 
     /**
@@ -217,78 +256,13 @@ abstract class Task
     }
 
     /**
-     * Retrieve the error that caused this task to fail
-     *
-     * @return string|null
-     */
-    public function getError(): ?string
-    {
-        return $this->error;
-    }
-
-    /**
-     * Retrieve the exception that caused this task to fail
-     *
-     * @return Throwable|null
-     */
-    public function getException(): ?Throwable
-    {
-        return $this->exception;
-    }
-
-    /**
-     * Set the exception that caused this task to fail
-     *
-     * @param Throwable $exception
-     * @return static
-     */
-    public function setException(Throwable $exception): static
-    {
-        $this->exception = $exception;
-        $this->error ??= $exception->getMessage();
-
-        return $this;
-    }
-
-    /**
-     * Retrieve the exception that caused this task rollback to fail
-     *
-     * @return Throwable|null
-     */
-    public function getRollbackException(): ?Throwable
-    {
-        return $this->rollbackException;
-    }
-
-    /**
-     * Determine whether this task should run
+     * Determine whether this task failed to rollback
      *
      * @return bool
      */
-    public function shouldRun(): bool
+    public function failedRollback(): bool
     {
-        return true;
-    }
-
-    /**
-     * Retrieve the reason why this task should not run
-     *
-     * @return string|null
-     */
-    public function getSkippingReason(): ?string
-    {
-        return $this->skippingReason;
-    }
-
-    /**
-     * Determine whether this task should rollback if the given task fails
-     *
-     * @param Task $task
-     * @return bool
-     */
-    public function shouldRollbackDueTo(Task $task): bool
-    {
-        return true;
+        return $this->ranRollback() && !$this->rolledback();
     }
 
     /**
@@ -308,6 +282,7 @@ abstract class Task
             $this->rolledback = $this->rollback() !== false;
         } catch (Throwable $e) {
             $this->rollbackException = $e;
+            $this->rollbackFailureReason ??= $e->getMessage();
         }
     }
 
@@ -319,6 +294,17 @@ abstract class Task
     public function ranRollback(): bool
     {
         return $this->ranRollback;
+    }
+
+    /**
+     * Determine whether this task should rollback if the given task fails
+     *
+     * @param Task $task
+     * @return bool
+     */
+    public function shouldRollbackDueTo(Task $task): bool
+    {
+        return true;
     }
 
     /**
@@ -338,17 +324,82 @@ abstract class Task
      */
     protected function rollback()
     {
-        return;
+        return $this->failRollbackWithReason('The rollback logic was not implemented');
     }
 
     /**
-     * Determine whether the next tasks should be stopped if this task fails
+     * Determine whether next tasks should be stopped if this task fails
      *
      * @return bool
      */
     public function stopsOnFailure(): bool
     {
+        return $this->stopsOnFailure;
+    }
+
+    /**
+     * Succeed the task while setting the given reason
+     *
+     * @param string $reason
+     * @return bool
+     */
+    protected function succeedWithReason(string $reason): bool
+    {
+        $this->successReason = $reason;
+
         return true;
+    }
+
+    /**
+     * Skip the task while setting the given reason
+     *
+     * @param string $reason
+     * @return bool
+     */
+    protected function skipWithReason(string $reason): bool
+    {
+        $this->failureReason = $reason;
+
+        return false;
+    }
+
+    /**
+     * Fail the task while setting the given reason
+     *
+     * @param string $reason
+     * @return bool
+     */
+    protected function failWithReason(string $reason): bool
+    {
+        $this->failureReason = $reason;
+
+        return false;
+    }
+
+    /**
+     * Succeed the task rollback while setting the given reason
+     *
+     * @param string $reason
+     * @return bool
+     */
+    protected function succeedRollbackWithReason(string $reason): bool
+    {
+        $this->rollbackSuccessReason = $reason;
+
+        return false;
+    }
+
+    /**
+     * Fail the task rollback while setting the given reason
+     *
+     * @param string $reason
+     * @return bool
+     */
+    protected function failRollbackWithReason(string $reason): bool
+    {
+        $this->rollbackFailureReason = $reason;
+
+        return false;
     }
 
     /**
@@ -361,11 +412,98 @@ abstract class Task
         return match (true) {
             $this->wasSkipped() => static::STATUS_SKIPPED,
             !$this->ran() => static::STATUS_PENDING,
-            $this->ranRollback() && !$this->rolledback() => static::STATUS_FAILED_ROLLBACK,
+            $this->failedRollback() => static::STATUS_FAILED_ROLLBACK,
             $this->rolledback() => static::STATUS_ROLLEDBACK,
             $this->failed() => static::STATUS_FAILED,
             $this->succeeded() => static::STATUS_SUCCEEDED,
         };
+    }
+
+    /**
+     * Retrieve the reason of the task status, if any
+     *
+     * @return string|null
+     */
+    public function getStatusReason(): ?string
+    {
+        return match ($this->getStatus()) {
+            static::STATUS_SUCCEEDED => $this->getSuccessReason(),
+            static::STATUS_SKIPPED => $this->getSkippingReason(),
+            static::STATUS_FAILED => $this->getFailureReason(),
+            static::STATUS_ROLLEDBACK => $this->getRollbackSuccessReason(),
+            static::STATUS_FAILED_ROLLBACK => $this->getRollbackFailureReason(),
+            default => null,
+        };
+    }
+
+    /**
+     * Retrieve the reason why this task succeeded
+     *
+     * @return string|null
+     */
+    public function getSuccessReason(): ?string
+    {
+        return $this->successReason;
+    }
+
+    /**
+     * Retrieve the reason why this task was not run
+     *
+     * @return string|null
+     */
+    public function getSkippingReason(): ?string
+    {
+        return $this->skippingReason;
+    }
+
+    /**
+     * Retrieve the reason why this task failed
+     *
+     * @return string|null
+     */
+    public function getFailureReason(): ?string
+    {
+        return $this->failureReason;
+    }
+
+    /**
+     * Retrieve the reason why the rollback of this task succeeded
+     *
+     * @return string|null
+     */
+    public function getRollbackSuccessReason(): ?string
+    {
+        return $this->rollbackSuccessReason;
+    }
+
+    /**
+     * Retrieve the reason why the rollback of this task failed
+     *
+     * @return string|null
+     */
+    public function getRollbackFailureReason(): ?string
+    {
+        return $this->rollbackFailureReason;
+    }
+
+    /**
+     * Retrieve the exception that caused this task to fail
+     *
+     * @return Throwable|null
+     */
+    public function getException(): ?Throwable
+    {
+        return $this->exception;
+    }
+
+    /**
+     * Retrieve the exception that caused this task rollback to fail
+     *
+     * @return Throwable|null
+     */
+    public function getRollbackException(): ?Throwable
+    {
+        return $this->rollbackException;
     }
 
     /**
