@@ -86,6 +86,17 @@ class TermwindPrinter implements Printer
      */
     public function printRunTask(Task $task): void
     {
+        $this->refreshTask($task);
+    }
+
+    /**
+     * Refresh the live section of the given task
+     *
+     * @param Task $task
+     * @return void
+     */
+    protected function refreshTask(Task $task): void
+    {
         $hash = spl_object_hash($task);
 
         $this->sections[$hash]->refresh();
@@ -99,9 +110,7 @@ class TermwindPrinter implements Printer
      */
     public function printRolledbackTask(Task $task): void
     {
-        $hash = spl_object_hash($task);
-
-        $this->sections[$hash]->refresh();
+        $this->refreshTask($task);
     }
 
     /**
