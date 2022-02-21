@@ -18,7 +18,7 @@ class StoppingTaskException extends RuntimeException
      */
     public function __construct(protected Task $task)
     {
-        parent::__construct($task->getError());
+        parent::__construct($task->getFailureReason());
     }
 
     /**
