@@ -2,6 +2,9 @@
 
 namespace Cerbero\ConsoleTasker\Tasks;
 
+use Illuminate\Support\Str;
+use Throwable;
+
 /**
  * An invalid task.
  *
@@ -12,9 +15,11 @@ class InvalidTask extends Task
      * Instantiate the class
      *
      * @param string $class
+     * @param Throwable|null $exception
      */
-    public function __construct(protected string $class)
+    public function __construct(protected string $class, protected ?Throwable $exception = null)
     {
+        $this->failureReason = $exception?->getMessage();
     }
 
     /**
@@ -22,7 +27,7 @@ class InvalidTask extends Task
      *
      * @return mixed
      */
-    public function run()
+    protected function run()
     {
         return false;
     }
@@ -45,7 +50,7 @@ class InvalidTask extends Task
      */
     public function getPurpose(): string
     {
-        return class_basename($this->class);
+        return (string) Str::of($this->class)->classBasename()->snake(' ');
     }
 
     /**
@@ -53,23 +58,8 @@ class InvalidTask extends Task
      *
      * @return string|null
      */
-    public function getError(): ?string
+    public function getFailureReason(): ?string
     {
-        if ($e = $this->getException()) {
-            return $e->getMessage();
-        }
-
-        return "The item [{$this->class}] is not a valid task";
-    }
-
-    /**
-     * Determine whether this task should rollback if the given task fails
-     *
-     * @param Task $task
-     * @return bool
-     */
-    public function shouldRollbackDueTo(Task $task): bool
-    {
-        return false;
+        return $this->failureReason ?: "The item [{$this->class}] is not a valid task";
     }
 }

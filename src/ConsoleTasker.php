@@ -61,24 +61,17 @@ class ConsoleTasker
      */
     protected function resolveTask(string $class): Task
     {
-        $isValid = false;
-        $task = new InvalidTask($class);
-
         try {
-            /** @var Task $task */
             $task = $this->app->make($class);
-            $isValid = $task instanceof Task;
         } catch (Throwable $e) {
-            $task->setException($e);
+            $task = new InvalidTask($class, $e);
         }
 
-        if ($isValid) {
-            return $task->setIO($this->input, $this->output)->setApp($this->app)->setData($this->getData());
+        if (!$task instanceof Task) {
+            $task = new InvalidTask($class);
         }
 
-        Summary::instance()->addInvalidTask($task);
-
-        return $task;
+        return $task->setIO($this->input, $this->output)->setApp($this->app)->setData($this->getData());
     }
 
     /**
