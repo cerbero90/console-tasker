@@ -2,6 +2,7 @@
 
 namespace Cerbero\ConsoleTasker\Concerns;
 
+use Cerbero\CommandValidator\ValidatesInput;
 use Cerbero\ConsoleTasker\ConsoleTasker;
 use Cerbero\ConsoleTasker\Data;
 
@@ -11,6 +12,8 @@ use Cerbero\ConsoleTasker\Data;
  */
 trait RunsTasks
 {
+    use ValidatesInput;
+
     /**
      * Handle the console command
      *
@@ -73,5 +76,15 @@ trait RunsTasks
     protected function data(): array
     {
         return [];
+    }
+
+    /**
+     * Retrieve the rules to validate data against
+     *
+     * @return array
+     */
+    protected function rules(): array
+    {
+        return $this->rules ?? [];
     }
 }
