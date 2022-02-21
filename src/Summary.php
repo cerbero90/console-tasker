@@ -3,6 +3,7 @@
 namespace Cerbero\ConsoleTasker;
 
 use Cerbero\ConsoleTasker\Exceptions\StoppingTaskException;
+use Cerbero\ConsoleTasker\Tasks\InvalidTask;
 use Cerbero\ConsoleTasker\Tasks\Task;
 use Throwable;
 
@@ -64,7 +65,7 @@ class Summary
     /**
      * The invalid tasks.
      *
-     * @var array
+     * @var InvalidTask[]
      */
     protected array $invalidTasks = [];
 
@@ -112,10 +113,24 @@ class Summary
         $this->executedTasks[] = $task;
 
         return match (true) {
+            $task instanceof InvalidTask => $this->addInvalidTask($task),
             $task->succeeded() => $this->addSucceededTask($task),
             $task->wasSkipped() => $this->addSkippedTask($task),
-            !$task->succeeded() => $this->addFailedTask($task),
+            $task->failed() => $this->addFailedTask($task),
         };
+    }
+
+    /**
+     * Add the given item to the invalid tasks
+     *
+     * @param InvalidTask $task
+     * @return static
+     */
+    protected function addInvalidTask(InvalidTask $task): static
+    {
+        $this->invalidTasks[] = $task;
+
+        return $this;
     }
 
     /**
@@ -162,6 +177,41 @@ class Summary
     }
 
     /**
+     * Add the given rolledback task due to the provided failed task
+     *
+     * @param Task $task
+     * @param Task $failedTask
+     * @return static
+     */
+    public function addRolledbackTask(Task $task, Task $failedTask): static
+    {
+        $this->rolledbackTasks[] = new RollbackScope($task, $failedTask);
+
+        if ($task->rolledback()) {
+            $this->succeededRollbacks[] = new RollbackScope($task, $failedTask);
+        } else {
+            $this->failedRollbacks[] = new RollbackScope($task, $failedTask);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add the given exception
+     *
+     * @param Throwable $e
+     * @return static
+     */
+    public function addException(Throwable $e): static
+    {
+        if (!$e instanceof StoppingTaskException) {
+            $this->exceptions[] = $e;
+        }
+
+        return $this;
+    }
+
+    /**
      * Retrieve the executed tasks
      *
      * @return Task[]
@@ -202,26 +252,6 @@ class Summary
     }
 
     /**
-     * Add the given rolledback task due to the provided failed task
-     *
-     * @param Task $task
-     * @param Task $failedTask
-     * @return static
-     */
-    public function addRolledbackTask(Task $task, Task $failedTask): static
-    {
-        $this->rolledbackTasks[] = new RollbackScope($task, $failedTask);
-
-        if ($task->rolledback()) {
-            $this->succeededRollbacks[] = new RollbackScope($task, $failedTask);
-        } else {
-            $this->failedRollbacks[] = new RollbackScope($task, $failedTask);
-        }
-
-        return $this;
-    }
-
-    /**
      * Retrieve the rolledback tasks
      *
      * @return RollbackScope[]
@@ -252,41 +282,13 @@ class Summary
     }
 
     /**
-     * Add the given item to the invalid tasks
-     *
-     * @param Task $task
-     * @return static
-     */
-    public function addInvalidTask(Task $task): static
-    {
-        $this->invalidTasks[] = $task;
-
-        return $this;
-    }
-
-    /**
      * Retrieve the invalid tasks
      *
-     * @return Task[]
+     * @return InvalidTask[]
      */
     public function getInvalidTasks(): array
     {
         return $this->invalidTasks;
-    }
-
-    /**
-     * Add the given exception
-     *
-     * @param Throwable $e
-     * @return static
-     */
-    public function addException(Throwable $e): static
-    {
-        if (!$e instanceof StoppingTaskException) {
-            $this->exceptions[] = $e;
-        }
-
-        return $this;
     }
 
     /**
@@ -316,9 +318,10 @@ class Summary
      */
     public function succeeded(): bool
     {
-        return empty($this->failedTasks)
+        return count($this->executedTasks) == count($this->succeededTasks) + count($this->skippedTasks)
+            && empty($this->failedTasks)
             && empty($this->rolledbackTasks)
-            && count($this->executedTasks) == count($this->succeededTasks) + count($this->skippedTasks)
+            && empty($this->invalidTasks)
             && empty($this->exceptions);
     }
 
