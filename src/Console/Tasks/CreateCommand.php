@@ -79,7 +79,7 @@ class CreateCommand extends FileCreator
 
         return [
             'tasks' => $this->getPaddedTasks($parsedTasks),
-            'useStatements' => $this->getUseStatements($parsedTasks),
+            'useStatements' => $this->getUseStatements(),
         ];
     }
 
@@ -96,25 +96,22 @@ class CreateCommand extends FileCreator
         }
 
         return collect($parsedTasks)
-            ->map(fn (ParsedTask $task) => str_repeat(' ', 8) . $task->name . '::class,')
+            ->map(fn (ParsedTask $task) => str_repeat(' ', 8) . 'Tasks\\' . $task->name . '::class,')
             ->implode(PHP_EOL);
     }
 
     /**
      * Retrieve the use statements
      *
-     * @param array $parsedTasks
      * @return string|null
      */
-    protected function getUseStatements(array $parsedTasks): ?string
+    protected function getUseStatements(): ?string
     {
         $namespace = Str::of($this->config('tasks_directory'))
             ->replace([$this->app->basePath('app/'), '/'], [$this->app->getNamespace(), '\\'])
-            ->append('\\', $this->data->name, '\\');
+            ->append('\\', $this->data->name);
 
-        return collect($parsedTasks)
-            ->map(fn (ParsedTask $task) => $namespace . $task->name)
-            ->push(Command::class, RunsTasks::class)
+        return collect([Command::class, RunsTasks::class, $namespace . ' as Tasks'])
             ->sort()
             ->map(fn (string $class) => "use {$class};")
             ->implode(PHP_EOL);
