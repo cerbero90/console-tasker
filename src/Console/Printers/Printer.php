@@ -12,20 +12,20 @@ use Cerbero\ConsoleTasker\Tasks\Task;
 interface Printer
 {
     /**
-     * Print the given task while it's running
+     * Print the given task while it's being executed
      *
      * @param Task $task
      * @return void
      */
-    public function printRunningTask(Task $task): void;
+    public function printExecutingTask(Task $task): void;
 
     /**
-     * Print the given task after it ran
+     * Print the given task after it was executed
      *
      * @param Task $task
      * @return void
      */
-    public function printRunTask(Task $task): void;
+    public function printExecutedTask(Task $task): void;
 
     /**
      * Print the given task after it rolled back

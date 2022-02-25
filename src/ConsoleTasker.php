@@ -82,13 +82,13 @@ class ConsoleTasker
      */
     protected function processTask(Task $task): bool
     {
-        $this->printer->printRunningTask($task);
+        $this->printer->printExecutingTask($task);
 
         $succeeded = $task->perform();
 
         Summary::instance()->addExecutedTask($task);
 
-        $this->printer->printRunTask($task);
+        $this->printer->printExecutedTask($task);
 
         if ($task->failed()) {
             $this->handleFailedTask($task);

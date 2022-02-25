@@ -66,7 +66,7 @@ class TermwindPrinter implements Printer
      * @param Task $task
      * @return void
      */
-    public function printRunningTask(Task $task): void
+    public function printExecutingTask(Task $task): void
     {
         $hash = spl_object_hash($task);
 
@@ -84,7 +84,7 @@ class TermwindPrinter implements Printer
      * @param Task $task
      * @return void
      */
-    public function printRunTask(Task $task): void
+    public function printExecutedTask(Task $task): void
     {
         $this->refreshTask($task);
     }
