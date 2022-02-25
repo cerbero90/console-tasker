@@ -113,7 +113,7 @@ class Summary
         $this->executedTasks[] = $task;
 
         return match (true) {
-            $task instanceof InvalidTask => $this->addInvalidTask($task),
+            $task->isInvalid() => $this->addInvalidTask($task),
             $task->succeeded() => $this->addSucceededTask($task),
             $task->wasSkipped() => $this->addSkippedTask($task),
             $task->failed() => $this->addFailedTask($task),

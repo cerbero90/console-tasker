@@ -256,6 +256,16 @@ abstract class Task
     }
 
     /**
+     * Determine whether this task is invalid
+     *
+     * @return bool
+     */
+    public function isInvalid(): bool
+    {
+        return $this instanceof InvalidTask;
+    }
+
+    /**
      * Determine whether this task failed to rollback
      *
      * @return bool
@@ -386,7 +396,7 @@ abstract class Task
     {
         $this->rollbackSuccessReason = $reason;
 
-        return false;
+        return true;
     }
 
     /**
