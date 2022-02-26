@@ -32,6 +32,20 @@ abstract class Task
     protected static bool $needsStub = false;
 
     /**
+     * The stub to print when displaying the summary.
+     *
+     * @var string|null
+     */
+    protected static ?string $summaryStub = null;
+
+    /**
+     * The data to fill the summary stub with.
+     *
+     * @var array
+     */
+    protected static array $summaryData = [];
+
+    /**
      * The application.
      *
      * @var Application
@@ -151,6 +165,26 @@ abstract class Task
     public static function needsStub(): bool
     {
         return static::$needsStub;
+    }
+
+    /**
+     * Retrieve the stub to print when displaying the summary.
+     *
+     * @return string|null
+     */
+    public static function getSummaryStub(): ?string
+    {
+        return static::$summaryStub;
+    }
+
+    /**
+     * Retrieve the data to fill the summary stub with
+     *
+     * @return array
+     */
+    public static function getSummaryData(): array
+    {
+        return static::$summaryData;
     }
 
     /**

@@ -77,6 +77,13 @@ class Summary
     protected array $exceptions = [];
 
     /**
+     * The exceptions thrown on rollback.
+     *
+     * @var Throwable[]
+     */
+    protected array $rollbackExceptions = [];
+
+    /**
      * The summary instance.
      *
      * @var self|null
@@ -191,6 +198,10 @@ class Summary
             $this->succeededRollbacks[] = new RollbackScope($task, $failedTask);
         } else {
             $this->failedRollbacks[] = new RollbackScope($task, $failedTask);
+
+            if ($e = $task->getRollbackException()) {
+                $this->rollbackExceptions[] = $e;
+            }
         }
 
         return $this;
@@ -302,13 +313,23 @@ class Summary
     }
 
     /**
+     * Retrieve the exceptions thrown on rollback
+     *
+     * @return Throwable[]
+     */
+    public function getRollbackExceptions(): array
+    {
+        return $this->rollbackExceptions;
+    }
+
+    /**
      * Retrieve the first exception thrown, if any
      *
      * @return Throwable|null
      */
     public function getFirstException(): ?Throwable
     {
-        return $this->exceptions[0] ?? null;
+        return $this->exceptions[0] ?? $this->rollbackExceptions[0] ?? null;
     }
 
     /**
@@ -322,7 +343,8 @@ class Summary
             && empty($this->failedTasks)
             && empty($this->rolledbackTasks)
             && empty($this->invalidTasks)
-            && empty($this->exceptions);
+            && empty($this->exceptions)
+            && empty($this->rollbackExceptions);
     }
 
     /**
@@ -341,6 +363,7 @@ class Summary
         $this->failedRollbacks = [];
         $this->invalidTasks = [];
         $this->exceptions = [];
+        $this->rollbackExceptions = [];
 
         static::$instance = null;
     }
