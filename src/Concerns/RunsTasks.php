@@ -28,9 +28,9 @@ trait RunsTasks
      * Run the given tasks
      *
      * @param string ...$tasks
-     * @return int
+     * @return bool
      */
-    protected function runTasks(string ...$tasks): int
+    protected function runTasks(string ...$tasks): bool
     {
         return $this->laravel->make(ConsoleTasker::class)
             ->setIO($this->input, $this->output)
