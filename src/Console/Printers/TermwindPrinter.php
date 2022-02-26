@@ -5,16 +5,17 @@ namespace Cerbero\ConsoleTasker\Console\Printers;
 use Cerbero\ConsoleTasker\Summary;
 use Cerbero\ConsoleTasker\Tasks\Task;
 use Illuminate\Contracts\View\Factory;
-use Termwind\Live;
+use NunoMaduro\Collision\Adapters\Laravel\Inspector;
+use NunoMaduro\Collision\Writer;
 
-use function Termwind\live;
+use function Termwind\render;
 use function Termwind\terminal;
 
 /**
  * The Termwind printer.
  *
  */
-class TermwindPrinter implements Printer
+class TermwindPrinter extends Printer
 {
     /**
      * The task status labels.
@@ -47,7 +48,7 @@ class TermwindPrinter implements Printer
     /**
      * The live sections.
      *
-     * @var Live[]
+     * @var LiveSection[]
      */
     protected array $sections = [];
 
@@ -70,7 +71,7 @@ class TermwindPrinter implements Printer
     {
         $hash = spl_object_hash($task);
 
-        $this->sections[$hash] = live(fn () => $this->view->make('console-tasker::task', [
+        $this->sections[$hash] = LiveSection::renderWith(fn () => $this->view->make('console-tasker::task', [
             'task' => $task,
             'color' => static::$statusColors[$task->getStatus()],
             'status' => static::$statusLabels[$task->getStatus()],
@@ -114,13 +115,47 @@ class TermwindPrinter implements Printer
     }
 
     /**
-     * Print the tasks summary
+     * Print the given summary stub
+     *
+     * @param string $path
+     * @param array $data
+     * @return void
+     */
+    protected function printSummaryStub(string $path, array $data): void
+    {
+        $this->render($path, $data);
+    }
+
+    /**
+     * Render the given view with the provided data
+     *
+     * @param string $view
+     * @param array $data
+     * @return void
+     */
+    protected function render(string $view, array $data): void
+    {
+        $view = $this->view->make($view, $data);
+
+        render($view->render());
+    }
+
+    /**
+     * Print the tasks error
      *
      * @param Summary $summary
      * @return void
      */
-    public function printSummary(Summary $summary): void
+    protected function printErrors(Summary $summary): void
     {
-        //
+        $this->render('console-tasker::error', [
+            'exception' => $exception = $summary->getFirstException(),
+        ]);
+
+        if ($exception) {
+            (new Writer())->write(new Inspector($exception));
+
+            render('<div class="mb-0"></div>');
+        }
     }
 }
