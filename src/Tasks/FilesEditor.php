@@ -13,6 +13,13 @@ abstract class FilesEditor extends Task
     use AccessesFiles;
 
     /**
+     * The stub to print when displaying the summary.
+     *
+     * @var string|null
+     */
+    protected static ?string $summaryStub = 'console-tasker::files-summary';
+
+    /**
      * Rollback this task
      *
      * @return void
@@ -24,6 +31,10 @@ abstract class FilesEditor extends Task
                 unlink($file->getPath());
             } else {
                 file_put_contents($file->getPath(), $file->getOriginalContent());
+            }
+
+            if (false !== $index = array_search($file, static::$summaryData['files'], true)) {
+                unset(static::$summaryData['files'][$index]);
             }
         }
     }

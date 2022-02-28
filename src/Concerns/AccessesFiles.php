@@ -36,7 +36,8 @@ trait AccessesFiles
      */
     protected function file(string $path): File
     {
-        return $this->files[] = File::from($path)->setData($this->getData());
+        /** @var \Cerbero\ConsoleTasker\Tasks\Task $this */
+        return static::$summaryData['files'][] = $this->files[] = File::from($path)->setData($this->getData());
     }
 
     /**
