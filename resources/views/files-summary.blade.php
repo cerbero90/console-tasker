@@ -1,7 +1,7 @@
 @if ($files)
     @php([$created, $updated] = collect($files)->partition(fn ($file) => $file->wasCreated()))
 
-    <div class="mx-2 mt-2 px-1 space-y-2">
+    <div class="mt-2 mx-2 mb-1 px-1 space-y-2">
         @if ($created->isNotEmpty())
             <div class="space-y-1">
                 <h2 class="text-center font-bold text-green-500">✨ Created files</h2>
