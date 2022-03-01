@@ -106,9 +106,9 @@ class ConsoleTasker
      */
     protected function handleFailedTask(Task $failedTask): void
     {
-        $succeededTasks = Summary::instance()->getSucceededTasks();
-
-        $this->rollbackTasksDueTo($failedTask, $succeededTasks);
+        if ($failedTask->rollbacksOnFailure()) {
+            $this->rollbackTasksDueTo($failedTask, Summary::instance()->getSucceededTasks());
+        }
 
         if ($failedTask->stopsOnFailure()) {
             throw $failedTask->getException() ?: new StoppingTaskException($failedTask);

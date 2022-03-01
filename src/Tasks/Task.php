@@ -95,6 +95,13 @@ abstract class Task
     protected bool $rolledback = false;
 
     /**
+     * Whether previous tasks should be rolled back if this task fails.
+     *
+     * @var bool
+     */
+    protected bool $rollbacksOnFailure = true;
+
+    /**
      * Whether next tasks should be stopped if this task fails.
      *
      * @var bool
@@ -369,6 +376,16 @@ abstract class Task
     protected function rollback()
     {
         return $this->failRollbackWithReason('The rollback logic was not implemented');
+    }
+
+    /**
+     * Determine whether previous tasks should be rolled back if this task fails
+     *
+     * @return bool
+     */
+    public function rollbacksOnFailure(): bool
+    {
+        return $this->rollbacksOnFailure;
     }
 
     /**
