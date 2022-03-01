@@ -50,10 +50,7 @@ abstract class FileCreator extends FilesEditor
             return $this->createFile();
         }
 
-        if (!$this->shouldBeSkippedIfFileExists()) {
-            $this->error = $this->getCreationError();
-            return false;
-        }
+        return $this->shouldBeSkippedIfFileExists();
     }
 
     /**
@@ -106,16 +103,6 @@ abstract class FileCreator extends FilesEditor
         }
 
         return !file_exists($this->getPath());
-    }
-
-    /**
-     * Retrieve the reason why the file could not be created
-     *
-     * @return string
-     */
-    protected function getCreationError(): string
-    {
-        return 'the file ' . basename($this->getPath()) . ' already exists';
     }
 
     /**
@@ -203,6 +190,16 @@ abstract class FileCreator extends FilesEditor
      */
     public function getSkippingReason(): ?string
     {
-        return $this->getCreationError();
+        return $this->getFailureReason();
+    }
+
+    /**
+     * Retrieve the reason why this task failed
+     *
+     * @return string|null
+     */
+    public function getFailureReason(): ?string
+    {
+        return $this->failureReason ?: 'the file ' . basename($this->getPath()) . ' already exists';
     }
 }
