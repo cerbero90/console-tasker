@@ -419,7 +419,7 @@ abstract class Task
      */
     protected function skipWithReason(string $reason): bool
     {
-        $this->failureReason = $reason;
+        $this->skippingReason = $reason;
 
         return false;
     }
