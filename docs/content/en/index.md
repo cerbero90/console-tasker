@@ -20,9 +20,11 @@ advantages:
 
 Console Tasker is a Laravel package to run and manage tasks in Artisan commands.
 
-Tasks execute any logic and run sequentially. Each task can determine whether it should run, rollback previous tasks on failure, print its outcome on the console and more.
+Tasks can execute any logic and run sequentially. Each task can determine whether it should run, how to print its outcome to the console, rollback previous tasks on failure and more.
 
-The goal of this package is to create lean, powerful, idempotent and beautiful Artisan commands with no effort.
+The goal of this package is to create lean, powerful, idempotent and beautiful Artisan commands with zero effort.
+
+It also provides ready-to-use tasks to automate the generation of source code in your Laravel apps.
 
 
 ## Advantages
