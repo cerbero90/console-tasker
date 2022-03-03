@@ -333,6 +333,95 @@ class Summary
     }
 
     /**
+     * Determine whether the given task was executed
+     *
+     * @param string $task
+     * @return bool
+     */
+    public function taskWasExecuted(string $task): bool
+    {
+        return $this->taskInArray($task, $this->getExecutedTasks());
+    }
+
+    /**
+     * Determine whether the given task class is present in the provided array
+     *
+     * @param string $class
+     * @param array $array
+     * @return bool
+     */
+    protected function taskInArray(string $class, array $array): bool
+    {
+        return collect($array)->contains(fn (Task $task) => $task instanceof $class);
+    }
+
+    /**
+     * Determine whether the given task succeeded
+     *
+     * @param string $task
+     * @return bool
+     */
+    public function taskSucceeded(string $task): bool
+    {
+        return $this->taskInArray($task, $this->getSucceededTasks());
+    }
+
+    /**
+     * Determine whether the given task was skipped
+     *
+     * @param string $task
+     * @return bool
+     */
+    public function taskWasSkipped(string $task): bool
+    {
+        return $this->taskInArray($task, $this->getSkippedTasks());
+    }
+
+    /**
+     * Determine whether the given task failed
+     *
+     * @param string $task
+     * @return bool
+     */
+    public function taskFailed(string $task): bool
+    {
+        return $this->taskInArray($task, $this->getFailedTasks());
+    }
+
+    /**
+     * Determine whether the given task rolled back
+     *
+     * @param string $task
+     * @return bool
+     */
+    public function taskRolledback(string $task): bool
+    {
+        return $this->taskInArray($task, $this->getRolledbackTasks());
+    }
+
+    /**
+     * Determine whether the given task succeeded to rollback
+     *
+     * @param string $task
+     * @return bool
+     */
+    public function taskSucceededRollback(string $task): bool
+    {
+        return $this->taskInArray($task, $this->getSucceededRollbacks());
+    }
+
+    /**
+     * Determine whether the given task failed to rollback
+     *
+     * @param string $task
+     * @return bool
+     */
+    public function taskFailedRollback(string $task): bool
+    {
+        return $this->taskInArray($task, $this->getFailedRollbacks());
+    }
+
+    /**
      * Determine whether all tasks succeeded
      *
      * @return bool
