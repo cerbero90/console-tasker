@@ -6,18 +6,6 @@ use Cerbero\ConsoleTasker\Tasks;
 return [
     /*
     |--------------------------------------------------------------------------
-    | Console printer
-    |--------------------------------------------------------------------------
-    |
-    | The console printer is responsible for printing the output of tasks that
-    | run and potential errors that may occur along the process. Out of the
-    | box a default printer is available, but you can set your own below.
-    |
-    */
-    'printer' => TermwindPrinter::class,
-
-    /*
-    |--------------------------------------------------------------------------
     | Tasks directory
     |--------------------------------------------------------------------------
     |
@@ -30,18 +18,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Task implementation verbs
+    | Console printer
     |--------------------------------------------------------------------------
     |
-    | Common tasks implementations are provided by this package, such as files
-    | creators and editors. Based on the verb chosen to name tasks, the apt
-    | implementation might be implicitly guessed during tasks generation.
+    | The console printer is responsible for printing the output of tasks that
+    | run and potential errors that may occur along the process. Out of the
+    | box a default printer is available, but you can set your own below.
     |
     */
-    'verbs' => [
-        Tasks\FileCreator::class => ['create', 'generate'],
-        Tasks\FilesEditor::class => ['add', 'update'],
-    ],
+    'printer' => TermwindPrinter::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -56,5 +41,20 @@ return [
     'modifiers' => [
         'c' => Tasks\FileCreator::class,
         'e' => Tasks\FilesEditor::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Task implementation verbs
+    |--------------------------------------------------------------------------
+    |
+    | Common tasks implementations are provided by this package, such as files
+    | creators and editors. Based on the verb chosen to name tasks, the apt
+    | implementation might be implicitly guessed during tasks generation.
+    |
+    */
+    'verbs' => [
+        Tasks\FileCreator::class => ['create', 'generate'],
+        Tasks\FilesEditor::class => ['add', 'update'],
     ],
 ];
