@@ -17,7 +17,7 @@ Laravel package to run and manage tasks in Artisan commands.
 
 ## 📦 Install
 
-Via Composer
+Via Composer:
 
 ``` bash
 composer require cerbero/console-tasker
@@ -25,9 +25,7 @@ composer require cerbero/console-tasker
 
 ## 🔮 Usage
 
-```php
-// WIP
-```
+Please refer to the [complete documentation](https://cerbero90.github.io/console-tasker).
 
 ## 📆 Change log
 
