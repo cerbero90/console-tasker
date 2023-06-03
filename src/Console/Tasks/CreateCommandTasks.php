@@ -17,18 +17,18 @@ class CreateCommandTasks extends FileCreator
     use ConfigAware;
 
     /**
+     * The list of parsed tasks.
+     *
+     * @var ParsedTask[]
+     */
+    protected array $parsedTasks;
+
+    /**
      * The parsed task to generate.
      *
      * @var ParsedTask
      */
     protected ParsedTask $parsedTask;
-
-    /**
-     * The reason why this task should not run.
-     *
-     * @var string|null
-     */
-    protected ?string $skippingReason = 'tasks to generate were not specified';
 
     /**
      * The reason why the created file needs to be updated.
@@ -53,15 +53,15 @@ class CreateCommandTasks extends FileCreator
      */
     public function run()
     {
-        $parsedTasks = $this->parser->parse($this->tasks);
+        $this->parsedTasks = $this->parser->parse($this->tasks ?: '');
 
-        foreach ($parsedTasks as $parsedTask) {
+        foreach ($this->parsedTasks as $parsedTask) {
             $this->parsedTask = $parsedTask;
 
-            $succeeded = parent::run() !== false && $this->createStub();
-
-            if (!$succeeded) {
-                return false;
+            if (parent::run() === false) {
+                return $this->failWithReason('Unable to create the task ' . $parsedTask->name);
+            } elseif (!$this->createStub()) {
+                return $this->failWithReason('Unable to create the stub for ' . $parsedTask->name);
             }
         }
     }
@@ -73,7 +73,7 @@ class CreateCommandTasks extends FileCreator
      */
     protected function createStub(): bool
     {
-        if (!$this->parsedTask->parent::needsStub()) {
+        if (!$this->parsedTask->needsStub) {
             return true;
         }
 
@@ -126,6 +126,30 @@ class CreateCommandTasks extends FileCreator
         return (string) Str::of($this->config('tasks_directory'))
             ->replace([$this->app->basePath('app/'), '/'], [$this->app->getNamespace(), '\\'])
             ->append('\\', $this->data->name, '\\', $this->parsedTask->name);
+    }
+
+    /**
+     * Retrieve the reason why this task succeeded
+     *
+     * @return string|null
+     */
+    public function getSuccessReason(): ?string
+    {
+        if (count($this->parsedTasks) == 1) {
+            return "the task {$this->parsedTask->name} was created successfully";
+        }
+
+        return 'the tasks were created successfully';
+    }
+
+    /**
+     * Retrieve the reason why this task should not run
+     *
+     * @return string|null
+     */
+    public function getSkippingReason(): ?string
+    {
+        return 'tasks to generate were not specified';
     }
 
     /**

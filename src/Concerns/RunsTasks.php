@@ -5,6 +5,7 @@ namespace Cerbero\ConsoleTasker\Concerns;
 use Cerbero\CommandValidator\ValidatesInput;
 use Cerbero\ConsoleTasker\ConsoleTasker;
 use Cerbero\ConsoleTasker\Data;
+use Cerbero\ConsoleTasker\TasksResolver;
 
 /**
  * The trait to run tasks.
@@ -12,6 +13,7 @@ use Cerbero\ConsoleTasker\Data;
  */
 trait RunsTasks
 {
+    use ConfigAware;
     use ValidatesInput;
 
     /**
@@ -21,31 +23,22 @@ trait RunsTasks
      */
     public function handle(): int
     {
-        return $this->runTasks(...$this->tasks()) ? 0 : 1;
+        return $this->runTasks() ? 0 : 1;
     }
 
     /**
      * Run the given tasks
      *
-     * @param string ...$tasks
      * @return bool
      */
-    protected function runTasks(string ...$tasks): bool
+    protected function runTasks(): bool
     {
-        return $this->laravel->make(ConsoleTasker::class)
+        $tasks = $this->laravel->make(TasksResolver::class)
             ->setIO($this->input, $this->output)
             ->setData($this->mergeData())
-            ->runTasks(...$tasks);
-    }
+            ->resolve($this->tasks());
 
-    /**
-     * Retrieve the list of tasks to run
-     *
-     * @return array
-     */
-    protected function tasks(): array
-    {
-        return $this->tasks ?? [];
+        return $this->laravel->make(ConsoleTasker::class)->runTasks($tasks);
     }
 
     /**
@@ -76,6 +69,29 @@ trait RunsTasks
     protected function data(): array
     {
         return [];
+    }
+
+    /**
+     * Retrieve the list of tasks to run
+     *
+     * @return array|string
+     */
+    protected function tasks(): array|string
+    {
+        return $this->tasks ?? $this->getTasksPath();
+    }
+
+    /**
+     * Retrieve the path where tasks are defined
+     *
+     * @return string
+     */
+    protected function getTasksPath(): string
+    {
+        $command = class_basename(static::class);
+        $directory = $this->config('tasks_directory');
+
+        return rtrim($directory, '/') . "/{$command}/tasks.php";
     }
 
     /**

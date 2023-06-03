@@ -12,7 +12,7 @@
 [![PSR-12][ico-psr12]][link-psr12]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Laravel package to run and manage tasks in Artisan commands.
+Laravel package to create lean, powerful, idempotent and beautiful Artisan commands.
 
 
 ## 📦 Install

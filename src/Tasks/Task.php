@@ -179,7 +179,7 @@ abstract class Task
      *
      * @return string|null
      */
-    public static function getSummaryStub(): ?string
+    public function getSummaryStub(): ?string
     {
         return static::$summaryStub;
     }
@@ -189,7 +189,7 @@ abstract class Task
      *
      * @return array
      */
-    public static function getSummaryData(): array
+    public function getSummaryData(): array
     {
         return static::$summaryData;
     }

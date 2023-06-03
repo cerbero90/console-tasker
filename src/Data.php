@@ -11,7 +11,7 @@ use Illuminate\Support\Fluent;
 class Data extends Fluent
 {
     /**
-     * Add the given data if it's not akready present
+     * Add the given data if it's not already present
      *
      * @param array $data
      * @return static

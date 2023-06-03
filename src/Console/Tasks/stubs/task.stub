@@ -15,7 +15,7 @@ class {{ class }} extends Task
      *
      * @return mixed
      */
-    public function run()
+    protected function run()
     {
         //
     }

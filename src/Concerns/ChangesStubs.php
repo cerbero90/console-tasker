@@ -8,10 +8,10 @@ use Illuminate\Support\Str;
 use ReflectionClass;
 
 /**
- * The trait to manipulate files by adding new stubs.
+ * The trait to manipulate files with stubs.
  *
  */
-trait AddsStubs
+trait ChangesStubs
 {
     /**
      * Add the given stub before the last occurrence of the searched text

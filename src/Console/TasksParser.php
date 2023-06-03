@@ -26,10 +26,12 @@ class TasksParser
         $rawTasks = explode(',', $input);
 
         foreach ($rawTasks as $rawTask) {
+            $rawTask = str_replace('*', '', $rawTask, $count);
             $segments = explode(':', $rawTask, 2);
             $parsedTasks[] = $parsedTask = new ParsedTask();
             $parsedTask->name = $segments[0];
             $parsedTask->parent = $this->guessParent($parsedTask, $segments[1] ?? '');
+            $parsedTask->needsStub = $count > 0 || $parsedTask->parent::needsStub();
         }
 
         return $parsedTasks;

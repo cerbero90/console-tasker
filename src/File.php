@@ -2,7 +2,8 @@
 
 namespace Cerbero\ConsoleTasker;
 
-use Cerbero\ConsoleTasker\Concerns;
+use Cerbero\ConsoleTasker\Concerns\ChangesContent;
+use Cerbero\ConsoleTasker\Concerns\DataAware;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Traits\Macroable;
 
@@ -13,9 +14,8 @@ use Illuminate\Support\Traits\Macroable;
 class File
 {
     use Macroable;
-    use Concerns\AddsLines;
-    use Concerns\AddsStubs;
-    use Concerns\DataAware;
+    use ChangesContent;
+    use DataAware;
 
     /**
      * Whether the file was created.

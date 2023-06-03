@@ -3,10 +3,10 @@
 namespace Cerbero\ConsoleTasker\Concerns;
 
 /**
- * The trait to manipulate files by adding new lines.
+ * The trait to manipulate files with lines.
  *
  */
-trait AddsLines
+trait ChangesLines
 {
     /**
      * Add the given line after the last occurrence of the searched line

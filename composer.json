@@ -33,7 +33,10 @@
     "autoload": {
         "psr-4": {
             "Cerbero\\ConsoleTasker\\": "src"
-        }
+        },
+        "files": [
+            "src/helpers"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

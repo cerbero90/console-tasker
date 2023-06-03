@@ -15,7 +15,7 @@ class {{ class }} extends FilesEditor
      *
      * @return mixed
      */
-    public function run()
+    protected function run()
     {
         $this->file('path/to/file/to/update')
             ->addLineAfterLast('text to search', 'line to add')

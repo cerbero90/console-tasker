@@ -2,13 +2,9 @@
 
 namespace Cerbero\ConsoleTasker;
 
-use Cerbero\ConsoleTasker\Concerns\DataAware;
-use Cerbero\ConsoleTasker\Concerns\IOAware;
 use Cerbero\ConsoleTasker\Console\Printers\Printer;
 use Cerbero\ConsoleTasker\Exceptions\StoppingTaskException;
-use Cerbero\ConsoleTasker\Tasks\InvalidTask;
 use Cerbero\ConsoleTasker\Tasks\Task;
-use Illuminate\Contracts\Foundation\Application;
 use Throwable;
 
 /**
@@ -17,32 +13,28 @@ use Throwable;
  */
 class ConsoleTasker
 {
-    use DataAware;
-    use IOAware;
-
     /**
      * Instantiate the class.
      *
-     * @param Application $app
      * @param Printer $printer
      */
-    public function __construct(protected Application $app, protected Printer $printer)
+    public function __construct(protected Printer $printer)
     {
     }
 
     /**
      * Run the given tasks
      *
-     * @param string ...$tasks
+     * @param Task[] $tasks
      * @return bool
      */
-    public function runTasks(string ...$tasks): bool
+    public function runTasks(iterable $tasks): bool
     {
         $summary = Summary::instance();
 
         try {
             foreach ($tasks as $task) {
-                $this->processTask($this->resolveTask($task));
+                $this->processTask($task);
             }
         } catch (Throwable $e) {
             $summary->addException($e);
@@ -51,27 +43,6 @@ class ConsoleTasker
         $this->printer->printSummary($summary);
 
         return $summary->succeeded();
-    }
-
-    /**
-     * Retrieve the resolved instance of the given task class
-     *
-     * @param string $class
-     * @return Task
-     */
-    protected function resolveTask(string $class): Task
-    {
-        try {
-            $task = $this->app->make($class);
-        } catch (Throwable $e) {
-            $task = new InvalidTask($class, $e);
-        }
-
-        if (!$task instanceof Task) {
-            $task = new InvalidTask($class);
-        }
-
-        return $task->setIO($this->input, $this->output)->setApp($this->app)->setData($this->getData());
     }
 
     /**
@@ -152,6 +123,8 @@ class ConsoleTasker
      */
     public function __destruct()
     {
+        TasksCollector::instance()->clear();
+
         Summary::instance()->clear();
     }
 }

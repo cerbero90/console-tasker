@@ -83,11 +83,10 @@ abstract class Printer
     protected function printResults(Summary $summary): void
     {
         foreach ($summary->getSucceededTasks() as $task) {
-            $stub = $task::getSummaryStub();
+            $stub = $task->getSummaryStub();
 
             if ($stub && !isset($this->printedSummaryStubs[$stub])) {
-                $this->printSummaryStub($stub, $task::getSummaryData());
-
+                $this->printSummaryStub($stub, $task->getSummaryData());
                 $this->printedSummaryStubs[$stub] = true;
             }
         }

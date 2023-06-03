@@ -34,11 +34,18 @@ abstract class FileCreator extends FilesEditor
     protected ?string $manualUpdateReason = null;
 
     /**
+     * The reason why this task succeeded.
+     *
+     * @var string|null
+     */
+    protected ?string $successReason = 'the file was created successfully';
+
+    /**
      * Run the task
      *
      * @return mixed
      */
-    public function run()
+    protected function run()
     {
         $file = $this->file($this->getPath());
 

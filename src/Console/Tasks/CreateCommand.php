@@ -19,6 +19,13 @@ class CreateCommand extends FileCreator
     use ConfigAware;
 
     /**
+     * The reason why this task succeeded.
+     *
+     * @var string|null
+     */
+    protected ?string $successReason = 'the command was created successfully';
+
+    /**
      * Instantiate the class.
      *
      * @param TasksParser $parser
