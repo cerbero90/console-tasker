@@ -2,7 +2,7 @@
 title: Installation
 description: 'How to install and configure Console Tasker.'
 position: 2
-category: Getting Started
+category: Getting started
 ---
 
 Console Tasker is very easy to install and configure.
@@ -57,14 +57,14 @@ More modifiers can be added or replaced with our own task implementations, speed
 
 <alert>
 
-If this sounds confusing at the moment - and it probably does 🤔 - have a look at [this section](generating-tasks) for more info.
+If this sounds confusing at the moment - and it probably does 🤔 - have a look at [this section](generating-console-tasker) for more info.
 
 </alert>
 
 
 ### `verbs`
 
-If you are a lazy dev - like me 🐼 - and find it tedious or don't like to add modifiers when generating tasks, you can associate the verbs you use to name tasks to a given task implementation.
+If you are a lazy dev - like me 🐼 - and find it tedious or don't like to add modifiers when generating tasks, you can associate the verbs you normally use to name tasks to a given task implementation.
 
 By default when we generate a task which name starts with `create` or `generate`, a task extending `Cerbero\ConsoleTasker\Tasks\FileCreator` is generated.
 
@@ -74,6 +74,6 @@ Feel free to change verbs and add your own task implementations as you need!
 
 <alert>
 
-Again, all this will hopefully make more sense after reading [this section](generating-tasks). 🙂
+Again, all this will hopefully make more sense after reading [this section](generating-console-tasker). 🙂
 
 </alert>
